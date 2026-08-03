@@ -10,4 +10,7 @@ interface UsuarioDao {
   
     @Insert(onConflict = OnConflictStrategy.REPLACE)  
     suspend fun insert(usuario: Usuario)  
-} 
+
+    @Query("SELECT COUNT(*) FROM usuarios")
+    suspend fun count(): Int
+}

@@ -1,25 +1,37 @@
-package com.multipos.app.adapters  
-  
-import android.view.LayoutInflater  
-import android.view.View  
-import android.view.ViewGroup  
-import android.widget.TextView  
-import androidx.recyclerview.widget.DiffUtil  
-import androidx.recyclerview.widget.ListAdapter  
-import androidx.recyclerview.widget.RecyclerView  
-import com.multipos.app.R  
-import com.multipos.app.data.entities.Producto  
-import java.text.NumberFormat  
-import java.util.Locale  
-  
-class ProductAdapter(private val onItemClick: (Producto) -> Unit) : ListAdapter<Producto, ProductAdapter.ProductViewHolder(DiffCallback()) {  
-  
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {  
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_product_card, parent, false)  
-        return ProductViewHolder(view)  
-    }  
-  
-    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {  
-        holder.bind(getItem(position), onItemClick)  
-    }  
-  
+package com.multipos.app.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.multipos.app.R
+import com.multipos.app.data.entities.Producto
+import java.text.NumberFormat
+import java.util.Locale
+
+class ProductAdapter(private val onItemClick: (Producto) -> Unit) :
+    ListAdapter<Producto, ProductAdapter.ProductViewHolder>(DiffCallback()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProductViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.item_product_card, parent, false)
+    )
+    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) = holder.bind(getItem(position))
+
+    inner class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val name: TextView = view.findViewById(R.id.txtName)
+        private val price: TextView = view.findViewById(R.id.txtPrice)
+        private val stock: TextView = view.findViewById(R.id.txtStock)
+        fun bind(product: Producto) {
+            name.text = product.nombre
+            price.text = NumberFormat.getCurrencyInstance(Locale.getDefault()).format(product.precioVenta)
+            stock.text = itemView.context.getString(R.string.stock_format, product.stock)
+            itemView.setOnClickListener { onItemClick(product) }
+        }
+    }
+    private class DiffCallback : DiffUtil.ItemCallback<Producto>() {
+        override fun areItemsTheSame(a: Producto, b: Producto) = a.id == b.id
+        override fun areContentsTheSame(a: Producto, b: Producto) = a == b
+    }
+}

@@ -10,8 +10,17 @@ interface ProductoDao {
     fun getAll(): Flow<List<Producto>>  
   
     @Insert(onConflict = OnConflictStrategy.REPLACE)  
-    suspend fun insert(product: Producto)  
+    suspend fun insert(product: Producto): Long
   
     @Update  
     suspend fun update(product: Producto)  
-} 
+
+    @Delete
+    suspend fun delete(product: Producto)
+
+    @Query("UPDATE productos SET stock = stock - :quantity WHERE id = :productId AND stock >= :quantity")
+    suspend fun decreaseStock(productId: Int, quantity: Int): Int
+
+    @Query("SELECT COUNT(*) FROM productos")
+    suspend fun count(): Int
+}

@@ -1,11 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:text="Home MultiPOS"
-        android:gravity="center"
-        android:textSize="24sp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <LinearLayout android:orientation="horizontal" android:padding="8dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:id="@+id/btnSales" android:text="Ventas" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnInventory" android:text="Inventario" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnHistory" android:text="Historial" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnClients" android:text="Clientes" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <FrameLayout android:id="@+id/homeContainer" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 </FrameLayout>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MultiPOS</string>
     <string name="login_hint_user">Usuario</string>
@@ -6,4 +6,13 @@
     <string name="btn_login">Ingresar</string>
     <string name="menu_inventory">Inventario</string>
     <string name="menu_pos">Ventas</string>
+    <string name="charge_sale">Cobrar venta</string>
+    <string name="sale_saved">Venta registrada correctamente</string>
+    <string name="empty_cart">Agrega productos al carrito</string>
+    <string name="stock_error">No hay stock suficiente para completar la venta</string>
+    <string name="stock_format">Stock: %1$d</string>
+    <string name="login_error">Usuario o contraseña incorrectos</string>
+    <string name="empty_products">No hay productos registrados</string>
+    <string name="cart_total">Total: %1$s</string>
+    <string name="add_to_cart">Añadir al carrito</string>
 </resources>
