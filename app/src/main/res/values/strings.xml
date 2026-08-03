@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MultiPOS</string>
+    <string name="login_hint_user">Usuario</string>
+    <string name="login_hint_pass">Contraseña</string>
+    <string name="btn_login">Ingresar</string>
+    <string name="menu_inventory">Inventario</string>
+    <string name="menu_pos">Ventas</string>
+</resources>

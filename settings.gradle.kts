@@ -1,0 +1,1 @@
+pluginManagement {     repositories {         google()         mavenCentral()         gradlePluginPortal()     } } echo dependencyResolutionManagement {     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)     repositories {         google()         mavenCentral()     } } echo rootProject.name = "MultiPOS" echo include ':app' 
