@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
@@ -14,8 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.multipos.app.data.entities.DetalleVenta
-import com.multipos.app.data.entities.Venta
+import com.multipos.app.data.entities.*
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.util.Money
 import java.text.SimpleDateFormat
@@ -26,8 +26,13 @@ import java.util.*
 fun SaleDetailScreen(
     sale: Venta?,
     details: List<DetalleVenta>,
+    refunds: List<Devolucion>,
+    vendedorName: String,
+    clienteName: String,
     onBackClick: () -> Unit,
     onAnnulClick: () -> Unit,
+    onRefundClick: () -> Unit,
+    canManageReturns: Boolean,
     modifier: Modifier = Modifier
 ) {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
@@ -60,18 +65,18 @@ fun SaleDetailScreen(
     ) { paddingValues ->
         if (sale == null) {
             Box(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Venta no encontrada")
+                CircularProgressIndicator()
             }
             return@Scaffold
         }
         
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
@@ -124,20 +129,22 @@ fun SaleDetailScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Información de la venta
                     InfoRow("Fecha", dateFormat.format(Date(sale.fecha)))
+                    InfoRow("Vendedor", vendedorName)
+                    InfoRow("Cliente", clienteName)
                     InfoRow("Método de pago", sale.tipoPago)
-                    InfoRow("Subtotal", Money.format(sale.subtotal))
                     
+                    Divider(modifier = Modifier.padding(vertical = 12.dp))
+                    
+                    InfoRow("Subtotal", Money.format(sale.subtotal))
                     if (sale.descuento > 0) {
                         InfoRow("Descuento", "-${Money.format(sale.descuento)}", Color.Red)
                     }
-                    
                     if (sale.impuesto > 0) {
                         InfoRow("Impuesto", Money.format(sale.impuesto))
                     }
                     
-                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     InfoRow(
                         "TOTAL",
@@ -148,9 +155,31 @@ fun SaleDetailScreen(
                 }
             }
             
+            // Sección de Devoluciones (si existen)
+            if (refunds.isNotEmpty()) {
+                Text(
+                    text = "Devoluciones Realizadas",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+                
+                refunds.forEach { refund ->
+                    MultiPOSCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(text = dateFormat.format(Date(refund.fecha)), style = MaterialTheme.typography.bodySmall)
+                                Text(text = Money.format(refund.monto), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
+                            }
+                            Text(text = "Motivo: ${refund.motivo}", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+            
             // Lista de items
             Text(
-                text = "Items",
+                text = "Productos",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -160,27 +189,38 @@ fun SaleDetailScreen(
                 SaleDetailItem(detail = detail)
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             
-            // Botón de anular (solo si está completada)
-            if (sale.estado == Venta.ESTADO_COMPLETADA) {
-                Button(
-                    onClick = onAnnulClick,
+            // Botones de acción
+            if (canManageReturns && sale.estado == Venta.ESTADO_COMPLETADA) {
+                if (refunds.isEmpty()) {
+                    Button(
+                        onClick = onAnnulClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Cancel, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Anular Venta Completa")
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                OutlinedButton(
+                    onClick = onRefundClick,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    enabled = details.isNotEmpty()
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Cancel,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Anular Venta")
+                    Text("Registrar Devolución Parcial")
                 }
             }
+            
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
@@ -194,7 +234,7 @@ fun InfoRow(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -229,7 +269,7 @@ fun SaleDetailItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = detail.nombreProducto,
+                    text = detail.nombreProductoSnapshot.ifBlank { "Producto #${detail.idProducto}" },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -245,7 +285,7 @@ fun SaleDetailItem(
                 )
                 
                 Text(
-                    text = "Precio unit: ${Money.format(detail.precioVenta)}",
+                    text = "Precio unit: ${Money.format(detail.precioUnitario)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

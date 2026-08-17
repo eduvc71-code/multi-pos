@@ -1,0 +1,186 @@
+package com.multipos.app.ui.clients.compose
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.multipos.app.data.entities.Cliente
+import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.ui.theme.success
+import com.multipos.app.util.Money
+
+data class MovimientoRow(
+    val fecha: String,
+    val tipo: String,
+    val importe: String,
+    val saldoPosterior: String,
+    val usuario: String,
+    val isNegativo: Boolean
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EstadoCuentaScreen(
+    cliente: Cliente?,
+    movimientos: List<MovimientoRow>,
+    desde: String,
+    hasta: String,
+    onDesdeChange: (String) -> Unit,
+    onHastaChange: (String) -> Unit,
+    onFiltrarClick: () -> Unit,
+    onRegistrarAbonoClick: () -> Unit,
+    onExportCsvClick: () -> Unit,
+    onExportPdfClick: () -> Unit,
+    onBackClick: () -> Unit,
+    canRegisterAbono: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = modifier.imePadding(),
+        topBar = {
+            TopAppBar(
+                title = { Text("Estado de Cuenta", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
+        ) {
+            // Resumen de cliente
+            item {
+                cliente?.let {
+                    MultiPOSCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = it.nombre, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text(text = "Límite: ${Money.format(it.limiteCredito)}", style = MaterialTheme.typography.bodyMedium)
+                            
+                            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                            
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column {
+                                    Text(text = "Deuda", style = MaterialTheme.typography.labelSmall)
+                                    Text(text = Money.format(it.creditoActual), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(text = "Disponible", style = MaterialTheme.typography.labelSmall)
+                                    Text(text = Money.format(it.creditoDisponible), color = MaterialTheme.colorScheme.success, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Filtros
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = desde,
+                                onValueChange = onDesdeChange,
+                                label = { Text("Desde") },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                            OutlinedTextField(
+                                value = hasta,
+                                onValueChange = onHastaChange,
+                                label = { Text("Hasta") },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                        }
+                        Button(onClick = onFiltrarClick, modifier = Modifier.fillMaxWidth()) {
+                            Text("Filtrar")
+                        }
+                    }
+                }
+            }
+            
+            // Acciones de Abono y Exportación
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (canRegisterAbono) {
+                        Button(
+                            onClick = onRegistrarAbonoClick,
+                            modifier = Modifier.weight(1.2f),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.success)
+                        ) {
+                            Text("Abonar", color = Color.White)
+                        }
+                    }
+                    
+                    OutlinedIconButton(onClick = onExportCsvClick) {
+                        Icon(Icons.Default.TableChart, contentDescription = "CSV")
+                    }
+                    OutlinedIconButton(onClick = onExportPdfClick) {
+                        Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF")
+                    }
+                }
+            }
+            
+            // Lista de Movimientos
+            if (movimientos.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        Text("Sin movimientos en el periodo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            } else {
+                items(movimientos) { mov ->
+                    MovimientoItem(mov)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MovimientoItem(mov: MovimientoRow) {
+    MultiPOSCard(modifier = Modifier.fillMaxWidth(), elevation = 1.dp) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = mov.tipo, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+                Text(text = mov.fecha, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = mov.usuario, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = mov.importe,
+                    fontWeight = FontWeight.Black,
+                    color = if (mov.isNegativo) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.success
+                )
+                Text(text = mov.saldoPosterior, style = MaterialTheme.typography.labelSmall)
+            }
+        }
+    }
+}

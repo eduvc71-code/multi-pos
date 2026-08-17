@@ -1,251 +1,147 @@
 package com.multipos.app.ui.home.compose
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.multipos.app.ui.theme.MultiPOSTheme
-
-data class HomeNavItem(
-    val id: String,
-    val label: String,
-    val icon: ImageVector,
-    val permission: String,
-    val color: Color? = null
-)
+import androidx.compose.ui.unit.sp
+import com.multipos.app.ui.components.MultiPOSCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    activeCompanyName: String,
     userName: String,
     userRole: String,
-    companyName: String,
     companyColor: Color,
-    onNavigateToDashboard: () -> Unit,
-    onNavigateToPOS: () -> Unit,
-    onNavigateToInventory: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToClients: () -> Unit,
-    onNavigateToEmployees: () -> Unit,
-    onNavigateToCash: () -> Unit,
-    onNavigateToReports: () -> Unit,
+    onLogoutClick: () -> Unit,
     onCompanyClick: () -> Unit,
-    onLogout: () -> Unit,
-    modifier: Modifier = Modifier
+    onMenuItemClick: (String) -> Unit,
+    selectedMenu: String,
+    content: @Composable () -> Unit
 ) {
-    val navItems = remember {
-        listOf(
-            HomeNavItem("dashboard", "Dashboard", Icons.Default.Dashboard, "VIEW_DASHBOARD"),
-            HomeNavItem("pos", "Ventas", Icons.Default.ShoppingCart, "SELL"),
-            HomeNavItem("inventory", "Inventario", Icons.Default.Inventory, "MANAGE_INVENTORY"),
-            HomeNavItem("history", "Historial", Icons.Default.History, "VIEW_HISTORY"),
-            HomeNavItem("clients", "Clientes", Icons.Default.People, "MANAGE_CLIENT_CREDIT"),
-            HomeNavItem("employees", "Empleados", Icons.Default.Badge, "MANAGE_EMPLOYEES"),
-            HomeNavItem("cash", "Caja", Icons.Default.AccountBalance, "MANAGE_CASH"),
-            HomeNavItem("reports", "Reportes", Icons.Default.Assessment, "VIEW_REPORTS")
-        )
-    }
-    
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "MultiPOS",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "$userName - $userRole",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            Surface(
+                shadowElevation = 4.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    // Header Card
+                    MultiPOSCard(elevation = 2.dp) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "ESPACIO DE TRABAJO",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    letterSpacing = 1.sp
+                                )
+                                TextButton(onClick = onLogoutClick) {
+                                    Text("Cerrar Sesión", color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                                }
+                            }
+                            
+                            Button(
+                                onClick = onCompanyClick,
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                contentPadding = PaddingValues(horizontal = 14.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.Business, contentDescription = null, tint = companyColor)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(text = "Empresa: $activeCompanyName", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(10.dp))
+                            
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(text = "$userName · $userRole", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = onCompanyClick) {
-                        Icon(
-                            imageVector = Icons.Default.Business,
-                            contentDescription = "Cambiar empresa"
-                        )
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
+                    // Menu Horizontal
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        MenuItem(Icons.Default.Analytics, "Inicio", selectedMenu == "DASHBOARD", companyColor) { onMenuItemClick("DASHBOARD") }
+                        MenuItem(Icons.Default.ShoppingCart, "Ventas", selectedMenu == "POS", companyColor) { onMenuItemClick("POS") }
+                        MenuItem(Icons.Default.Inventory, "Inventario", selectedMenu == "INVENTORY", companyColor) { onMenuItemClick("INVENTORY") }
+                        MenuItem(Icons.Default.History, "Historial", selectedMenu == "HISTORY", companyColor) { onMenuItemClick("HISTORY") }
+                        MenuItem(Icons.Default.People, "Clientes", selectedMenu == "CLIENTS", companyColor) { onMenuItemClick("CLIENTS") }
+                        MenuItem(Icons.Default.Badge, "Equipo", selectedMenu == "EMPLOYEES", companyColor) { onMenuItemClick("EMPLOYEES") }
+                        MenuItem(Icons.Default.Payments, "Caja", selectedMenu == "CASH", companyColor) { onMenuItemClick("CASH") }
+                        MenuItem(Icons.Default.BarChart, "Reportes", selectedMenu == "REPORTS", companyColor) { onMenuItemClick("REPORTS") }
                     }
-                    IconButton(onClick = onLogout) {
-                        Icon(
-                            imageVector = Icons.Default.Logout,
-                            contentDescription = "Cerrar sesión"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = companyColor,
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
-                )
-            )
+                }
+            }
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            // Card de empresa activa
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = companyColor.copy(alpha = 0.1f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Empresa Activa",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = companyName,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = companyColor
-                        )
-                    }
-                    IconButton(onClick = onCompanyClick) {
-                        Icon(
-                            imageVector = Icons.Default.SwapHoriz,
-                            contentDescription = "Cambiar empresa",
-                            tint = companyColor
-                        )
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Menú Principal",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Grid de navegación
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(navItems) { item ->
-                    NavGridItem(
-                        navItem = item,
-                        onClick = {
-                            when (item.id) {
-                                "dashboard" -> onNavigateToDashboard()
-                                "pos" -> onNavigateToPOS()
-                                "inventory" -> onNavigateToInventory()
-                                "history" -> onNavigateToHistory()
-                                "clients" -> onNavigateToClients()
-                                "employees" -> onNavigateToEmployees()
-                                "cash" -> onNavigateToCash()
-                                "reports" -> onNavigateToReports()
-                            }
-                        },
-                        baseColor = companyColor
-                    )
-                }
-            }
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            content()
         }
     }
 }
 
 @Composable
-fun NavGridItem(
-    navItem: HomeNavItem,
-    onClick: () -> Unit,
-    baseColor: Color,
-    modifier: Modifier = Modifier
+fun MenuItem(
+    icon: ImageVector,
+    label: String,
+    isSelected: Boolean,
+    accentColor: Color,
+    onClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier
-            .aspectRatio(1f)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = baseColor.copy(alpha = 0.08f)
+    Button(
+        onClick = onClick,
+        modifier = Modifier.height(46.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) accentColor else MaterialTheme.colorScheme.surfaceVariant
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = onClick
+        contentPadding = PaddingValues(horizontal = 14.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = navItem.icon,
+                imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = baseColor
+                modifier = Modifier.size(18.dp),
+                tint = if (isSelected) Color.White else accentColor
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = navItem.label,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = baseColor,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                text = label,
+                fontSize = 13.sp,
+                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HomeScreenPreview() {
-    MultiPOSTheme {
-        HomeScreen(
-            userName = "Juan Pérez",
-            userRole = "Administrador",
-            companyName = "Mi Tienda MultiPOS",
-            companyColor = Color(0xFF1976D2),
-            onNavigateToDashboard = {},
-            onNavigateToPOS = {},
-            onNavigateToInventory = {},
-            onNavigateToHistory = {},
-            onNavigateToClients = {},
-            onNavigateToEmployees = {},
-            onNavigateToCash = {},
-            onNavigateToReports = {},
-            onCompanyClick = {},
-            onLogout = {}
-        )
     }
 }
