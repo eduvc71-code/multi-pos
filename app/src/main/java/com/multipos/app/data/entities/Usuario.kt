@@ -28,6 +28,9 @@ data class Usuario(
     /** Epoch ms del último login correcto. */
     val ultimoLogin: Long? = null
 ) {
+    val bloqueado: Boolean get() = bloqueadoHasta != null && bloqueadoHasta > System.currentTimeMillis()
+    val username: String get() = usuario
+
     companion object {
         const val ROL_PROPIETARIO = "PROPIETARIO"
         const val ROL_ADMINISTRADOR = "ADMINISTRADOR"

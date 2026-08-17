@@ -41,8 +41,10 @@
             android:fontFamily="sans-serif-black"
             android:text="@string/sale_detail_title"
             android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="16sp"
+            app:autoSizeMaxTextSize="20sp" />
     </LinearLayout>
 
     <ScrollView

@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -19,9 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSTextField
+import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.ui.theme.onBackgroundVariant
 
 @Composable
 fun LoginScreen(
@@ -38,6 +42,7 @@ fun LoginScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .imePadding() // Asegura que el contenido se mueva con el teclado
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center
@@ -173,5 +178,20 @@ fun LoginScreen(
             
             Spacer(modifier = Modifier.height(36.dp))
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    MultiPOSTheme {
+        LoginScreen(
+            username = "admin",
+            password = "password",
+            isLoading = false,
+            onUsernameChange = {},
+            onPasswordChange = {},
+            onLoginClick = {}
+        )
     }
 }

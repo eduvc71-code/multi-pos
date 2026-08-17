@@ -12,10 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.Usuario
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSSearchField
+import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.ui.theme.warningContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +32,7 @@ fun EmployeesScreen(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        modifier = modifier.imePadding(),
         topBar = {
             TopAppBar(
                 title = {
@@ -54,92 +58,116 @@ fun EmployeesScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
+        LazyColumn(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
         ) {
-            MultiPOSSearchField(
-                value = searchQuery,
-                onValueChange = onSearchChange,
-                placeholder = "Buscar empleado por nombre o usuario..."
-            )
-            
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+            item {
+                MultiPOSSearchField(
+                    value = searchQuery,
+                    onValueChange = onSearchChange,
+                    placeholder = "Buscar empleado por nombre o usuario..."
                 )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
+            }
+            
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
-                    StatItem(
-                        label = "Total Empleados",
-                        value = employees.size.toString(),
-                        icon = Icons.Default.Badge
-                    )
-                    StatItem(
-                        label = "Activos",
-                        value = employees.count { !it.bloqueado }.toString(),
-                        icon = Icons.Default.CheckCircle
-                    )
-                    StatItem(
-                        label = "Bloqueados",
-                        value = employees.count { it.bloqueadoHasta != null && it.bloqueadoHasta!! > System.currentTimeMillis() }.toString(),
-                        icon = Icons.Default.Block
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        StatItem(
+                            label = "Total Empleados",
+                            value = employees.size.toString(),
+                            icon = Icons.Default.Badge
+                        )
+                        StatItem(
+                            label = "Activos",
+                            value = employees.count { !it.bloqueado }.toString(),
+                            icon = Icons.Default.CheckCircle
+                        )
+                        StatItem(
+                            label = "Bloqueados",
+                            value = employees.count { it.bloqueadoHasta != null && it.bloqueadoHasta!! > System.currentTimeMillis() }.toString(),
+                            icon = Icons.Default.Block
+                        )
+                    }
                 }
             }
             
             if (employees.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 64.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Badge,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No hay empleados registrados",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        MultiPOSButton(
-                            text = "Agregar primer empleado",
-                            onClick = onAddEmployeeClick,
-                            modifier = Modifier.width(200.dp)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Badge,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No hay empleados registrados",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            MultiPOSButton(
+                                text = "Agregar primer empleado",
+                                onClick = onAddEmployeeClick,
+                                modifier = Modifier.width(200.dp)
+                            )
+                        }
                     }
                 }
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(employees, key = { it.id }) { employee ->
-                        EmployeeCard(
-                            employee = employee,
-                            onEditClick = { onEditEmployeeClick(employee) }
-                        )
-                    }
+                items(employees, key = { it.id }) { employee ->
+                    EmployeeCard(
+                        employee = employee,
+                        onEditClick = { onEditEmployeeClick(employee) }
+                    )
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EmployeesScreenPreview() {
+    val dummyEmployees = listOf(
+        Usuario(1, "Juan Pérez", "juan", "", null, null, "ADMINISTRADOR", "EMP01", true, false, System.currentTimeMillis(), 0, null, null),
+        Usuario(2, "María López", "maria", "", null, null, "CAJERO", "EMP01", true, false, System.currentTimeMillis(), 0, null, null),
+        Usuario(3, "Pedro Gómez", "pedro", "", null, null, "VENDEDOR", "EMP01", true, false, System.currentTimeMillis(), 0, System.currentTimeMillis() + 3600000, null)
+    )
+    MultiPOSTheme {
+        EmployeesScreen(
+            employees = dummyEmployees,
+            searchQuery = "",
+            isLoading = false,
+            onSearchChange = {},
+            onAddEmployeeClick = {},
+            onEditEmployeeClick = {}
+        )
     }
 }
 

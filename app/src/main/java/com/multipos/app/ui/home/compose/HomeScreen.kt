@@ -14,15 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
 
 data class HomeNavItem(
     val id: String,
     val label: String,
     val icon: ImageVector,
     val permission: String,
-    val color: Color = MaterialTheme.colorScheme.primary
+    val color: Color? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -223,5 +224,28 @@ fun NavGridItem(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    MultiPOSTheme {
+        HomeScreen(
+            userName = "Juan Pérez",
+            userRole = "Administrador",
+            companyName = "Mi Tienda MultiPOS",
+            companyColor = Color(0xFF1976D2),
+            onNavigateToDashboard = {},
+            onNavigateToPOS = {},
+            onNavigateToInventory = {},
+            onNavigateToHistory = {},
+            onNavigateToClients = {},
+            onNavigateToEmployees = {},
+            onNavigateToCash = {},
+            onNavigateToReports = {},
+            onCompanyClick = {},
+            onLogout = {}
+        )
     }
 }

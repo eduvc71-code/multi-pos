@@ -13,11 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSSearchField
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,9 +32,12 @@ fun InventoryScreen(
     onAddProductClick: () -> Unit,
     onEditProductClick: (Producto) -> Unit,
     onDeleteProductClick: (Producto) -> Unit,
+    onMovementsClick: () -> Unit,
+    onScanClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        modifier = modifier.imePadding(),
         topBar = {
             TopAppBar(
                 title = {
@@ -43,6 +48,18 @@ fun InventoryScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onScanClick) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Escanear código"
+                        )
+                    }
+                    IconButton(onClick = onMovementsClick) {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = "Movimientos"
+                        )
+                    }
                     IconButton(onClick = onAddProductClick) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -114,7 +131,7 @@ fun InventoryScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Inventory_2,
+                            imageVector = Icons.Default.Inventory,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -265,5 +282,28 @@ fun ProductInventoryCard(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun InventoryScreenPreview() {
+    val dummyProducts = listOf(
+        Producto(1, "Coca Cola 2L", "PROD001", 1500, 1000, 24, 5, "Bebidas", "", "7501055300075", "EAN_13", "EMP01"),
+        Producto(2, "Pan de Molde", "PROD002", 2200, 1500, 12, 3, "Panadería", "", "7501055300082", "EAN_13", "EMP01"),
+        Producto(3, "Leche Entera", "PROD003", 1100, 800, 4, 10, "Lácteos", "", "7501055300099", "EAN_13", "EMP01")
+    )
+    MultiPOSTheme {
+        InventoryScreen(
+            products = dummyProducts,
+            searchQuery = "",
+            isLoading = false,
+            onSearchChange = {},
+            onAddProductClick = {},
+            onEditProductClick = {},
+            onDeleteProductClick = {},
+            onMovementsClick = {},
+            onScanClick = {}
+        )
     }
 }

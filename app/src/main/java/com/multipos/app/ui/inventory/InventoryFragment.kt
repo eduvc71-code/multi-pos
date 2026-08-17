@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +15,14 @@ import android.widget.Toast
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.multipos.app.R
-import com.multipos.app.adapters.ProductAdapter
 import com.multipos.app.data.ActiveCompanyStore
 import com.multipos.app.data.AppDatabase
 import com.multipos.app.data.DatabaseProvider
@@ -30,16 +31,18 @@ import com.multipos.app.data.InventoryMovementRepository
 import com.multipos.app.data.InventoryMovementRequest
 import com.multipos.app.data.entities.MovimientoInventario
 import com.multipos.app.data.entities.Producto
-import com.multipos.app.databinding.FragmentInventoryBinding
 import com.multipos.app.security.ActiveCompanyAccess
 import com.multipos.app.security.CompanyPermission
+import com.multipos.app.ui.inventory.compose.InventoryScreen
 import com.multipos.app.ui.scanner.ScannerActivity
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
+import com.multipos.app.viewmodel.InventoryViewModel
+import com.multipos.app.viewmodel.InventoryViewModelFactory
 import kotlinx.coroutines.launch
 
 class InventoryFragment : Fragment() {
-    private var _binding: FragmentInventoryBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var viewModel: InventoryViewModel
     private var scanConsumer: ((String, String) -> Unit)? = null
 
     private val scannerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -52,69 +55,70 @@ class InventoryFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentInventoryBinding.inflate(inflater, container, false)
         val db = DatabaseProvider.get(requireContext())
         val companyId = ActiveCompanyStore.get(requireContext())
-        val adapter = ProductAdapter { showProductDialog(it, db) }
-        binding.recyclerInventory.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerInventory.adapter = adapter
-        binding.btnAddProduct.isEnabled = false
-        binding.btnScanInventory.isEnabled = false
-        binding.btnAddMovement.isEnabled = false
-        binding.etInventorySearch.isEnabled = false
-        binding.btnAddProduct.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                    showProductDialog(null, db)
-                }
-            }
-        }
-        binding.btnAddMovement.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                    showMovementDialog(db, companyId, adapter.currentList)
-                }
-            }
-        }
-        binding.btnScanInventory.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                    scanConsumer = { code, format ->
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            val existing = db.productoDao().getByCode(companyId, code)
-                            showProductDialog(existing, db, if (existing == null) code else null, format)
+        val factory = InventoryViewModelFactory(db.productoDao(), companyId)
+        viewModel = ViewModelProvider(this, factory)[InventoryViewModel::class.java]
+
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MultiPOSTheme {
+                    val state by viewModel.uiState.collectAsState()
+                    InventoryScreen(
+                        products = state.filteredProducts,
+                        searchQuery = state.searchQuery,
+                        isLoading = state.isLoading,
+                        onSearchChange = { viewModel.onSearchQueryChange(it) },
+                        onAddProductClick = {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
+                                    showProductDialog(null, db)
+                                }
+                            }
+                        },
+                        onEditProductClick = { product ->
+                            showProductDialog(product, db)
+                        },
+                        onDeleteProductClick = { product ->
+                            confirmDeleteProduct(product, db)
+                        },
+                        onMovementsClick = {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
+                                    showMovementDialog(db, companyId, viewModel.uiState.value.products)
+                                }
+                            }
+                        },
+                        onScanClick = {
+                            scanConsumer = { code, _ ->
+                                viewModel.onSearchQueryChange(code)
+                            }
+                            openScanner("Buscar producto")
                         }
-                    }
-                    openScanner("Buscar producto")
+                    )
                 }
             }
         }
-        var catalog = emptyList<Producto>()
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                Toast.makeText(requireContext(), "No tienes permiso para administrar inventario", Toast.LENGTH_LONG).show()
-                return@launch
+    }
+
+    private fun confirmDeleteProduct(product: Producto, db: AppDatabase) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Eliminar producto")
+            .setMessage("Esta acción no se puede deshacer.")
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Eliminar") { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    if (!ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
+                        Toast.makeText(requireContext(), "No tienes permiso para eliminar productos", Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    if (db.productoDao().archive(product.id, product.empresaId) == 1) {
+                        Toast.makeText(requireContext(), "Producto eliminado", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-            binding.btnAddProduct.isEnabled = true
-            binding.btnScanInventory.isEnabled = true
-            binding.btnAddMovement.isEnabled = true
-            binding.etInventorySearch.isEnabled = true
-            db.productoDao().getAll(companyId).collect {
-                catalog = it
-                adapter.submitList(it)
-            }
-        }
-        binding.etInventorySearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s?.toString()?.trim()?.lowercase().orEmpty()
-                adapter.submitList(if (query.isBlank()) catalog else catalog.filter {
-                    it.nombre.lowercase().contains(query) || it.codigo.lowercase().contains(query) || it.codigoBarras?.lowercase()?.contains(query) == true
-                })
-            }
-            override fun afterTextChanged(s: Editable?) = Unit
-        })
-        return binding.root
+            .show()
     }
 
     private fun showProductDialog(existing: Producto?, db: AppDatabase, scannedBarcode: String? = null, scannedFormat: String? = null) {
@@ -194,25 +198,8 @@ class InventoryFragment : Fragment() {
                 }
             }
             if (existing != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Eliminar producto")
-                    .setMessage("Esta acción no se puede deshacer.")
-                    .setNegativeButton("Cancelar", null)
-                    .setPositiveButton("Eliminar") { _, _ ->
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            if (!ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                                Toast.makeText(requireContext(), "Ya no tienes permiso para eliminar productos", Toast.LENGTH_LONG).show()
-                                return@launch
-                            }
-                            if (db.productoDao().archive(existing.id, existing.empresaId) == 1) {
-                                dialog.dismiss()
-                                Toast.makeText(requireContext(), "Producto eliminado", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(requireContext(), "El producto ya no está disponible", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
-                    .show()
+                confirmDeleteProduct(existing, db)
+                dialog.dismiss()
             }
         }
         dialog.show()
@@ -315,10 +302,5 @@ class InventoryFragment : Fragment() {
             }
         }
         dialog.show()
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

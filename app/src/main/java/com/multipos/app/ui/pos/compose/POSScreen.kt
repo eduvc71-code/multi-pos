@@ -12,12 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.ui.components.CartItemCard
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSSearchField
+import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.ui.theme.success
+import com.multipos.app.ui.theme.warning
 
 data class CartLine(
     val productId: Int,
@@ -25,6 +29,11 @@ data class CartLine(
     val price: Long,
     val quantity: Int,
     val product: Producto? = null
+)
+
+data class CartItem(
+    val product: com.multipos.app.data.entities.Producto,
+    val quantity: Int
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +62,7 @@ fun POSScreen(
     var showPaymentOptions by remember { mutableStateOf(false) }
     
     Scaffold(
+        modifier = modifier.imePadding(), // Evita que el teclado tape el resumen del carrito
         topBar = {
             TopAppBar(
                 title = {
@@ -399,6 +409,43 @@ fun ProductListItem(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun POSScreenPreview() {
+    val dummyProducts = listOf(
+        Producto(1, "Coca Cola 2L", "PROD001", 1500, 1000, 24, 5, "Bebidas", "", "7501055300075", "EAN_13", "EMP01"),
+        Producto(2, "Pan de Molde", "PROD002", 2200, 1500, 12, 3, "Panadería", "", "7501055300082", "EAN_13", "EMP01"),
+        Producto(3, "Leche Entera", "PROD003", 1100, 800, 4, 10, "Lácteos", "", "7501055300099", "EAN_13", "EMP01")
+    )
+    val dummyCart = listOf(
+        CartLine(1, "Coca Cola 2L", 1500, 2),
+        CartLine(2, "Pan de Molde", 2200, 1)
+    )
+    
+    MultiPOSTheme {
+        POSScreen(
+            products = dummyProducts,
+            cartLines = dummyCart,
+            selectedClient = "Juan Cliente",
+            paymentMethod = "EFECTIVO",
+            total = 5200,
+            searchQuery = "",
+            isLoading = false,
+            onSearchChange = {},
+            onAddToCart = {},
+            onIncreaseQuantity = {},
+            onDecreaseQuantity = {},
+            onRemoveFromCart = {},
+            onClearCart = {},
+            onPaymentMethodSelected = {},
+            onClientSelected = {},
+            onChargeClick = {},
+            onScanProduct = {},
+            onScanClientQr = {}
+        )
     }
 }
 

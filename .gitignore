@@ -52,4 +52,10 @@ coverage/
 
 # Compiled JavaScript (if any)
 *.js.map
+
+# Project specific
+.artifacts/
+*.hprof
+captures/
+
 ```

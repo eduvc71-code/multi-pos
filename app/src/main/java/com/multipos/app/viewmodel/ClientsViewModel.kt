@@ -3,37 +3,37 @@ package com.multipos.app.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.multipos.app.data.entities.Producto
-import com.multipos.app.data.dao.ProductoDao
+import com.multipos.app.data.entities.Cliente
+import com.multipos.app.data.dao.ClienteDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-data class InventoryUiState(
-    val products: List<Producto> = emptyList(),
-    val filteredProducts: List<Producto> = emptyList(),
+data class ClientsUiState(
+    val clients: List<Cliente> = emptyList(),
+    val filteredClients: List<Cliente> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
-class InventoryViewModel(private val productoDao: ProductoDao, private val companyId: String) : ViewModel() {
-    private val _uiState = MutableStateFlow(InventoryUiState())
-    val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
+class ClientsViewModel(private val clienteDao: ClienteDao, private val companyId: String) : ViewModel() {
+    private val _uiState = MutableStateFlow(ClientsUiState())
+    val uiState: StateFlow<ClientsUiState> = _uiState.asStateFlow()
 
     init {
-        loadProducts()
+        loadClients()
     }
 
-    private fun loadProducts() {
+    private fun loadClients() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            productoDao.getAll(companyId).collectLatest { list ->
+            clienteDao.getAll(companyId).collectLatest { list ->
                 _uiState.value = _uiState.value.copy(
-                    products = list,
-                    filteredProducts = filterList(list, _uiState.value.searchQuery),
+                    clients = list,
+                    filteredClients = filterList(list, _uiState.value.searchQuery),
                     isLoading = false
                 )
             }
@@ -43,27 +43,26 @@ class InventoryViewModel(private val productoDao: ProductoDao, private val compa
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(
             searchQuery = query,
-            filteredProducts = filterList(_uiState.value.products, query)
+            filteredClients = filterList(_uiState.value.clients, query)
         )
     }
 
-    private fun filterList(list: List<Producto>, query: String): List<Producto> {
+    private fun filterList(list: List<Cliente>, query: String): List<Cliente> {
         if (query.isBlank()) return list
         val lowerQuery = query.lowercase()
         return list.filter {
             it.nombre.lowercase().contains(lowerQuery) ||
-                    it.codigo.lowercase().contains(lowerQuery) ||
-                    it.codigoBarras?.lowercase()?.contains(lowerQuery) == true
+                    it.documento?.lowercase()?.contains(lowerQuery) == true
         }
     }
 }
 
-class InventoryViewModelFactory(
-    private val productoDao: ProductoDao,
+class ClientsViewModelFactory(
+    private val clienteDao: ClienteDao,
     private val companyId: String
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return InventoryViewModel(productoDao, companyId) as T
+        return ClientsViewModel(clienteDao, companyId) as T
     }
 }

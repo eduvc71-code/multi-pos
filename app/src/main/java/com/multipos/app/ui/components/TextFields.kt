@@ -2,12 +2,15 @@ package com.multipos.app.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 /**
@@ -22,6 +25,8 @@ fun MultiPOSTextField(
     placeholder: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorMessage: String? = null,
     singleLine: Boolean = true,
@@ -46,6 +51,8 @@ fun MultiPOSTextField(
         isError = isError,
         singleLine = singleLine,
         enabled = enabled,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
         supportingText = errorMessage?.let { { Text(it) } }
     )
 }
@@ -123,7 +130,7 @@ fun MultiPOSNumberField(
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
-        keyboardType = KeyboardType.Number,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
         enabled = enabled
     )

@@ -9,37 +9,35 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.multipos.app.R
 import com.multipos.app.data.ActiveCompanyStore
 import com.multipos.app.data.CashRepository
 import com.multipos.app.data.DatabaseProvider
 import com.multipos.app.data.UserSessionStore
-import com.multipos.app.adapters.MovementAdapter
 import com.multipos.app.data.entities.MovimientoCaja
 import com.multipos.app.data.entities.Usuario
-import com.multipos.app.databinding.FragmentCashBinding
 import com.multipos.app.security.ActiveCompanyAccess
 import com.multipos.app.security.CompanyPermission
+import com.multipos.app.ui.cash.compose.CashScreen
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
-import com.multipos.app.viewmodel.CashUiState
 import com.multipos.app.viewmodel.CashViewModel
 import com.multipos.app.viewmodel.CashViewModelFactory
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class CashFragment : Fragment() {
-    private var _binding: FragmentCashBinding? = null
-    private val binding get() = _binding!!
     private lateinit var viewModel: CashViewModel
     private var currentUserId: Int = 0
     private var canManageManualMovements = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentCashBinding.inflate(inflater, container, false)
         val db = DatabaseProvider.get(requireContext())
         val companyId = ActiveCompanyStore.get(requireContext())
         val userId = UserSessionStore.userId(requireContext())
@@ -47,54 +45,31 @@ class CashFragment : Fragment() {
         val repository = CashRepository(db)
         val factory = CashViewModelFactory(repository, companyId, userId)
         viewModel = ViewModelProvider(this, factory)[CashViewModel::class.java]
-        val adapter = MovementAdapter()
-        binding.recyclerMovimientos.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerMovimientos.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
             val role = ActiveCompanyAccess.role(requireContext(), db)
-            if (!com.multipos.app.security.CompanyPermissions.allows(role, CompanyPermission.MANAGE_CASH)) {
-                Toast.makeText(requireContext(), "No tienes permiso para administrar caja", Toast.LENGTH_LONG).show()
-                return@launch
-            }
             canManageManualMovements = role == Usuario.ROL_PROPIETARIO || role == Usuario.ROL_ADMINISTRADOR
-            viewModel.uiState.collectLatest { state ->
-                renderState(state)
-                adapter.submitList(state.movements)
+        }
+
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MultiPOSTheme {
+                    val state by viewModel.uiState.collectAsState()
+                    CashScreen(
+                        expectedBalance = state.expected,
+                        ingresos = state.ingresos,
+                        egresos = state.egresos,
+                        movements = state.movements,
+                        isCashOpen = state.session != null,
+                        isLoading = state.isLoading,
+                        onOpenCashClick = { showOpenDialog() },
+                        onCloseCashClick = { showCloseDialog() },
+                        onAddIncomeClick = { showMovementDialog(MovimientoCaja.TIPO_INGRESO_MANUAL) },
+                        onAddExpenseClick = { showMovementDialog(MovimientoCaja.TIPO_EGRESO_MANUAL) }
+                    )
+                }
             }
-        }
-
-        binding.btnOpenCash.setOnClickListener { showOpenDialog() }
-        binding.btnAddIncome.setOnClickListener { showMovementDialog(MovimientoCaja.TIPO_INGRESO_MANUAL) }
-        binding.btnAddExpense.setOnClickListener { showMovementDialog(MovimientoCaja.TIPO_EGRESO_MANUAL) }
-        binding.btnCloseCash.setOnClickListener { showCloseDialog() }
-
-        return binding.root
-    }
-
-    private fun renderState(state: CashUiState) {
-        if (state.session != null) {
-            binding.txtCashStatus.text = getString(R.string.cash_subtitle_open)
-            binding.btnOpenCash.visibility = View.GONE
-            binding.btnCloseCash.visibility = if (
-                canManageManualMovements || state.session.abiertaPorUsuarioId == currentUserId
-            ) View.VISIBLE else View.GONE
-            binding.btnAddIncome.visibility = if (canManageManualMovements) View.VISIBLE else View.GONE
-            binding.btnAddExpense.visibility = if (canManageManualMovements) View.VISIBLE else View.GONE
-        } else {
-            binding.txtCashStatus.text = getString(R.string.cash_subtitle_closed)
-            binding.btnOpenCash.visibility = View.VISIBLE
-            binding.btnCloseCash.visibility = View.GONE
-            binding.btnAddIncome.visibility = View.GONE
-            binding.btnAddExpense.visibility = View.GONE
-        }
-        binding.txtCashIngresos.text = Money.format(state.ingresos)
-        binding.txtCashEgresos.text = Money.format(state.egresos)
-        binding.txtCashExpected.text = Money.format(state.expected)
-
-        state.error?.let { error ->
-            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
-            viewModel.clearError()
         }
     }
 
@@ -124,7 +99,6 @@ class CashFragment : Fragment() {
                     Toast.makeText(context, getString(R.string.cash_error_monto_invalid), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
                 viewModel.openSession(monto)
                 dialog.dismiss()
             }
@@ -133,6 +107,10 @@ class CashFragment : Fragment() {
     }
 
     private fun showMovementDialog(tipo: String) {
+        if (!canManageManualMovements) {
+            Toast.makeText(requireContext(), "No tienes permiso para registrar movimientos manuales", Toast.LENGTH_SHORT).show()
+            return
+        }
         val context = requireContext()
         val amountInput = EditText(context).apply {
             hint = getString(R.string.cash_hint_monto)
@@ -167,7 +145,6 @@ class CashFragment : Fragment() {
                     Toast.makeText(context, getString(R.string.cash_error_concepto_invalid), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
                 viewModel.addManualMovement(tipo, monto, concepto)
                 dialog.dismiss()
             }
@@ -176,7 +153,13 @@ class CashFragment : Fragment() {
     }
 
     private fun showCloseDialog() {
-        viewModel.uiState.value.session ?: return
+        val state = viewModel.uiState.value
+        if (state.session == null) return
+        if (!canManageManualMovements && state.session.abiertaPorUsuarioId != currentUserId) {
+            Toast.makeText(requireContext(), "No tienes permiso para cerrar esta sesión de caja", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val context = requireContext()
         val countInput = EditText(context).apply {
             hint = getString(R.string.cash_hint_conteo)
@@ -236,10 +219,5 @@ class CashFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .setPositiveButton("Cerrar caja") { _, _ -> viewModel.closeSession(contado, nota) }
             .show()
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

@@ -95,39 +95,12 @@ fun MultiPOSTheme(
     )
 }
 
-// Extensiones para acceder fácilmente a los colores del tema
-val Colors.primary: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.primary
+// Extensiones para colores personalizados MultiPOS
+val ColorScheme.success: Color get() = MultiPOSSuccess
+val ColorScheme.warning: Color get() = MultiPOSWarning
+val ColorScheme.onBackgroundVariant: Color get() = if (isLight) MultiPOSTextSecondary else MultiPOSDarkTextSecondary
+val ColorScheme.warningContainer: Color get() = MultiPOSWarning.copy(alpha = 0.1f)
 
-val Colors.secondary: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.secondary
+private val ColorScheme.isLight: Boolean
+    get() = this.primary == MultiPOSPrimary
 
-val Colors.background: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.background
-
-val Colors.surface: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.surface
-
-val Colors.onPrimary: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.onPrimary
-
-val Colors.onSurface: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.onSurface
-
-val Colors.success: Color
-    @Composable
-    get() = MultiPOSSuccess
-
-val Colors.warning: Color
-    @Composable
-    get() = MultiPOSWarning
-
-val Colors.error: Color
-    @Composable
-    get() = MultiPOSError

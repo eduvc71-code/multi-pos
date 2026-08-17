@@ -10,12 +10,15 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.multipos.app.R 
 import com.multipos.app.databinding.ActivityHomeBinding
 import com.multipos.app.ui.inventory.InventoryFragment
@@ -49,9 +52,24 @@ class HomeActivity : AppCompatActivity() {
     private var navigationInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) { 
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState) 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(systemBars.bottom, ime.bottom)
+            )
+            insets
+        }
+
         val db = DatabaseProvider.get(this)
         val userId = UserSessionStore.userId(this)
         if (userId == 0) {

@@ -6,8 +6,11 @@ import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.multipos.app.R
 import com.multipos.app.data.AuthRepository
@@ -25,10 +28,29 @@ import kotlinx.coroutines.withContext
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootScrollView) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                if (ime.bottom > 0) ime.bottom else systemBars.bottom
+            )
+            
+            insets
+        }
+
         val db = DatabaseProvider.get(this)
+        
+        setupAutoScroll()
+        
         lifecycleScope.launch {
             if (db.empresaDao().count() == 0 || db.usuarioDao().count() == 0) {
                 startActivity(Intent(this@LoginActivity, SetupActivity::class.java))
@@ -123,6 +145,20 @@ class LoginActivity : AppCompatActivity() {
         if (membership == null) com.multipos.app.data.ActiveCompanyStore.set(this, user.empresaId)
         startActivity(Intent(this, HomeActivity::class.java))
         finish()
+    }
+
+    private fun setupAutoScroll() {
+        val inputs = listOf(binding.etUser, binding.etPassword)
+        inputs.forEach { input ->
+            input.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) {
+                    view.postDelayed({
+                        val parent = view.parent.parent as? android.view.View ?: view
+                        binding.rootScrollView.smoothScrollTo(0, parent.top - 20)
+                    }, 400)
+                }
+            }
+        }
     }
 
     private fun setLoading(loading: Boolean) {

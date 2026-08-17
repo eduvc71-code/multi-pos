@@ -33,6 +33,7 @@ fun SaleDetailScreen(
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     
     Scaffold(
+        modifier = modifier.imePadding(),
         topBar = {
             TopAppBar(
                 title = {

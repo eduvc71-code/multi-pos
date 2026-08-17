@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:isScrollContainer="true">
 
     <LinearLayout
+        android:id="@+id/setupContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingTop="32dp"
-        android:paddingBottom="40dp">
+        android:paddingBottom="64dp">
 
         <!-- Top Header Brand Icon & Titles -->
         <LinearLayout
@@ -39,9 +43,12 @@
                 android:layout_marginStart="14dp"
                 android:text="@string/setup_title"
                 android:textColor="@color/text_primary"
-                android:textSize="26sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-black" />
+                android:fontFamily="sans-serif-black"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeMaxTextSize="26sp"
+                app:autoSizeStepGranularity="1sp" />
         </LinearLayout>
 
         <TextView

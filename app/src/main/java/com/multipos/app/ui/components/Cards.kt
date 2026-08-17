@@ -2,12 +2,16 @@ package com.multipos.app.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.multipos.app.ui.theme.MultiPOSTypography
 
@@ -18,7 +22,7 @@ import com.multipos.app.ui.theme.MultiPOSTypography
 fun MultiPOSCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 2.dp,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -163,7 +167,7 @@ fun CartItemCard(
                     enabled = quantity > 1
                 ) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Remove,
+                        imageVector = Icons.Default.Remove,
                         contentDescription = "Disminuir cantidad",
                         tint = if (quantity > 1) 
                             MaterialTheme.colorScheme.primary 
@@ -183,7 +187,7 @@ fun CartItemCard(
                 
                 IconButton(onClick = onIncreaseQuantity) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Add,
+                        imageVector = Icons.Default.Add,
                         contentDescription = "Aumentar cantidad",
                         tint = MaterialTheme.colorScheme.primary
                     )

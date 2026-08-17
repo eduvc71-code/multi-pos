@@ -12,10 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.MovimientoCaja
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
+import com.multipos.app.ui.components.MultiPOSOutlineButton
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,17 +26,20 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashScreen(
-    currentBalance: Long,
+    expectedBalance: Long,
+    ingresos: Long,
+    egresos: Long,
     movements: List<MovimientoCaja>,
+    isCashOpen: Boolean,
     isLoading: Boolean,
     onOpenCashClick: () -> Unit,
     onCloseCashClick: () -> Unit,
-    onRegisterMovementClick: () -> Unit,
+    onAddIncomeClick: () -> Unit,
+    onAddExpenseClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isCashOpen = movements.isNotEmpty() || currentBalance > 0
-    
     Scaffold(
+        modifier = modifier.imePadding(),
         topBar = {
             TopAppBar(
                 title = {
@@ -45,12 +51,6 @@ fun CashScreen(
                 },
                 actions = {
                     if (isCashOpen) {
-                        IconButton(onClick = onRegisterMovementClick) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Registrar movimiento"
-                            )
-                        }
                         IconButton(onClick = onCloseCashClick) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -60,112 +60,128 @@ fun CashScreen(
                     } else {
                         IconButton(onClick = onOpenCashClick) {
                             Icon(
-                                imageVector = Icons.Default.Unlock,
+                                imageVector = Icons.Default.LockOpen,
                                 contentDescription = "Abrir caja"
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = if (isCashOpen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    titleContentColor = if (isCashOpen) Color.White else MaterialTheme.colorScheme.surface,
-                    actionIconContentColor = if (isCashOpen) Color.White else MaterialTheme.colorScheme.surface
+                    containerColor = if (isCashOpen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = if (isCashOpen) Color.White else MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = if (isCashOpen) Color.White else MaterialTheme.colorScheme.onSurface
                 )
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
+        LazyColumn(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isCashOpen) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
-                        MaterialTheme.colorScheme.surfaceVariant
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            // Card de resumen
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isCashOpen) 
+                            MaterialTheme.colorScheme.primaryContainer 
+                        else 
+                            MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Icon(
-                        imageVector = if (isCashOpen) Icons.Default.AccountBalance else Icons.Default.Lock,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = if (isCashOpen) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = if (isCashOpen) "Saldo Actual" else "Caja Cerrada",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (isCashOpen) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = Money.format(currentBalance),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isCashOpen) Color.White else MaterialTheme.colorScheme.onSurface
-                    )
-                    if (!isCashOpen) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        MultiPOSButton(
-                            text = "Abrir Caja",
-                            onClick = onOpenCashClick,
-                            modifier = Modifier.width(160.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = if (isCashOpen) "Efectivo Esperado" else "Caja Cerrada",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
+                        Text(
+                            text = Money.format(expectedBalance),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        
+                        if (isCashOpen) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                SummaryItem(
+                                    label = "Ingresos",
+                                    value = Money.format(ingresos),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                SummaryItem(
+                                    label = "Egresos",
+                                    value = Money.format(egresos),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(onClick = onOpenCashClick) {
+                                Text("Abrir Caja")
+                            }
+                        }
                     }
                 }
             }
             
             if (isCashOpen) {
-                Text(
-                    text = "Movimientos del Día",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                // Acciones rápidas
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        MultiPOSOutlineButton(
+                            text = "+ Ingreso",
+                            onClick = onAddIncomeClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                        MultiPOSOutlineButton(
+                            text = "- Egreso",
+                            onClick = onAddExpenseClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                
+                item {
+                    Text(
+                        text = "Movimientos recientes",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 
                 if (movements.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ReceiptLong,
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = "No hay movimientos registrados",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Text("No hay movimientos registrados", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp)
-                    ) {
-                        items(movements, key = { it.id }) { movement ->
-                            MovementCard(movement = movement)
-                        }
+                    items(movements, key = { it.id }) { movement ->
+                        MovementCard(movement = movement)
                     }
                 }
             }
@@ -173,53 +189,71 @@ fun CashScreen(
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MovementCard(
-    movement: MovimientoCaja,
-    modifier: Modifier = Modifier
-) {
+fun CashScreenPreview() {
+    val dummyMovements = listOf(
+        MovimientoCaja(1, 1L, "EMP01", 1, "VENTA_EFECTIVO", 1500, null, null, null, "Venta #F-001", System.currentTimeMillis(), ""),
+        MovimientoCaja(2, 1L, "EMP01", 1, "EGRESO_MANUAL", 500, null, null, null, "Pago de basura", System.currentTimeMillis() - 3600000, ""),
+        MovimientoCaja(3, 1L, "EMP01", 1, "INGRESO_MANUAL", 2000, null, null, null, "Aporte inicial", System.currentTimeMillis() - 7200000, "")
+    )
+    MultiPOSTheme {
+        CashScreen(
+            expectedBalance = 3000,
+            ingresos = 3500,
+            egresos = 500,
+            movements = dummyMovements,
+            isCashOpen = true,
+            isLoading = false,
+            onOpenCashClick = {},
+            onCloseCashClick = {},
+            onAddIncomeClick = {},
+            onAddExpenseClick = {}
+        )
+    }
+}
+
+@Composable
+fun SummaryItem(label: String, value: String, color: Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
+        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = color)
+    }
+}
+
+@Composable
+fun MovementCard(movement: MovimientoCaja) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = when (movement.tipo) {
-                "INGRESO" -> MaterialTheme.colorScheme.secondaryContainer
-                "EGRESO" -> MaterialTheme.colorScheme.errorContainer
-                else -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val icon = when (movement.tipo) {
+                "INGRESO_MANUAL", "VENTA_EFECTIVO" -> Icons.Default.AddCircle
+                "EGRESO_MANUAL" -> Icons.Default.RemoveCircle
+                else -> Icons.Default.Info
+            }
+            val tint = when (movement.tipo) {
+                "INGRESO_MANUAL", "VENTA_EFECTIVO" -> MaterialTheme.colorScheme.primary
+                "EGRESO_MANUAL" -> MaterialTheme.colorScheme.error
+                else -> MaterialTheme.colorScheme.onSurfaceVariant
+            }
+            
+            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = movement.descripcion,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatDateTime(movement.fecha),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                )
+                Text(text = movement.descripcion, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                Text(text = formatDateTime(movement.fecha), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text(
-                text = if (movement.tipo == "INGRESO") "+${Money.format(movement.monto)}" else "-${Money.format(movement.monto)}",
+                text = Money.format(movement.monto),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = when (movement.tipo) {
-                    "INGRESO" -> MaterialTheme.colorScheme.onSecondaryContainer
-                    "EGRESO" -> MaterialTheme.colorScheme.onErrorContainer
-                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                color = tint
             )
         }
     }

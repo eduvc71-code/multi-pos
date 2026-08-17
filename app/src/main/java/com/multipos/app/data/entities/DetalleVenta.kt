@@ -15,4 +15,7 @@ data class DetalleVenta(
     val costoUnitario: Long = 0,
     val nombreProductoSnapshot: String = "",
     val empresaId: String = Empresa.DEFAULT_ID
-) 
+) {
+    val nombreProducto: String get() = nombreProductoSnapshot
+    val precioVenta: Long get() = precioUnitario
+}

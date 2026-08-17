@@ -10,10 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.ReportData
 import com.multipos.app.data.ReportRow
+import com.multipos.app.data.ReportSummary
 import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 
 @Composable
@@ -25,73 +28,81 @@ fun ReportsScreen(
     onExportCsv: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .imePadding()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
     ) {
         // Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Reportes",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            
-            if (reportData != null) {
-                FilterChip(
-                    onClick = onExportCsv,
-                    label = { Text("Exportar CSV") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Assessment,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Reportes",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+                
+                if (reportData != null) {
+                    FilterChip(
+                        selected = false,
+                        onClick = onExportCsv,
+                        label = { Text("Exportar CSV") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Assessment,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    )
+                }
             }
         }
         
         // Selector de tipo de reporte
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Tipo de Reporte: $reportType",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                 )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Button(
-                    onClick = onGenerateReport,
-                    enabled = !isLoading,
-                    modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Generar Reporte")
+                    Text(
+                        text = "Tipo de Reporte: $reportType",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Button(
+                        onClick = onGenerateReport,
+                        enabled = !isLoading,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Text("Generar Reporte")
+                        }
                     }
                 }
             }
@@ -100,96 +111,122 @@ fun ReportsScreen(
         // Resultados del reporte
         if (reportData != null) {
             // Resumen
-            MultiPOSCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 2.dp
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+            item {
+                MultiPOSCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = 2.dp
                 ) {
-                    Text(
-                        text = "Resumen",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    // Métricas clave
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
-                        MetricItem(
-                            label = "Total Ventas",
-                            value = Money.format(reportData.totalVentas),
-                            modifier = Modifier.weight(1f)
+                        Text(
+                            text = "Resumen",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        MetricItem(
-                            label = "Total Ganancia",
-                            value = Money.format(reportData.totalGanancia),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        MetricItem(
-                            label = "Total Ventas (count)",
-                            value = reportData.totalVentasCount.toString(),
-                            modifier = Modifier.weight(1f)
-                        )
-                        MetricItem(
-                            label = "Rentabilidad",
-                            value = "%.1f%%".format(reportData.rentabilidad),
-                            modifier = Modifier.weight(1f)
-                        )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Métricas clave
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            MetricItem(
+                                label = "Total Ventas",
+                                value = Money.format(reportData.totalVentas),
+                                modifier = Modifier.weight(1f)
+                            )
+                            MetricItem(
+                                label = "Total Ganancia",
+                                value = Money.format(reportData.totalGanancia),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            MetricItem(
+                                label = "Total Ventas (count)",
+                                value = reportData.totalVentasCount.toString(),
+                                modifier = Modifier.weight(1f)
+                            )
+                            MetricItem(
+                                label = "Rentabilidad",
+                                value = "%.1f%%".format(reportData.rentabilidad),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }
             
             // Tabla de datos
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(reportData.rows, key = { it.id }) { row ->
-                    ReportRowItem(row = row)
-                }
+            items(reportData.rows, key = { it.id }) { row ->
+                ReportRowItem(row = row)
             }
         } else if (!isLoading) {
             // Estado vacío
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 64.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Assessment,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Selecciona filtros y genera un reporte",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Assessment,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Selecciona filtros y genera un reporte",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ReportsScreenPreview() {
+    val dummyRows = listOf(
+        ReportRow(1, "2026-08-16", "Ventas", "Venta Hoy", 125050, "Ventas del día", 15, 125050),
+        ReportRow(2, "2026-08-15", "Ventas", "Venta Ayer", 185000, "Ventas del día anterior", 22, 185000)
+    )
+    val dummyData = ReportData(
+        rows = dummyRows,
+        summary = ReportSummary(mapOf("Ventas" to 310050)),
+        totalVentas = 310050,
+        totalGanancia = 85000,
+        totalVentasCount = 37,
+        rentabilidad = 27.4
+    )
+    
+    MultiPOSTheme {
+        ReportsScreen(
+            reportType = "Ventas por Día",
+            reportData = dummyData,
+            isLoading = false,
+            onGenerateReport = {},
+            onExportCsv = {}
+        )
     }
 }
 

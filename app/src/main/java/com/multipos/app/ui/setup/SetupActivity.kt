@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.room.withTransaction
 import com.multipos.app.data.ActiveCompanyStore
@@ -25,10 +28,51 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySetupBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivitySetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootScrollView) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                if (ime.bottom > 0) ime.bottom else systemBars.bottom
+            )
+            
+            insets
+        }
+
         binding.btnCreateWorkspace.setOnClickListener { createWorkspace() }
+        
+        setupAutoScroll()
+    }
+
+    private fun setupAutoScroll() {
+        val inputs = listOf(
+            binding.etBusinessName,
+            binding.etBusinessNit,
+            binding.etOwnerName,
+            binding.etUsername,
+            binding.etPassword,
+            binding.etConfirmPassword
+        )
+        
+        inputs.forEach { input ->
+            input.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) {
+                    view.postDelayed({
+                        // Desplazar para que el campo esté arriba en el ScrollView
+                        val parent = view.parent.parent as? android.view.View ?: view
+                        binding.rootScrollView.smoothScrollTo(0, parent.top - 20)
+                    }, 400)
+                }
+            }
+        }
     }
 
     private fun createWorkspace() {

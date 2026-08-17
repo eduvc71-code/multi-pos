@@ -30,6 +30,8 @@ data class MovimientoCaja(
     val fecha: Long,
     val detalle: String = ""
 ) {
+    val descripcion: String get() = if (detalle.isNotBlank()) "$concepto - $detalle" else concepto
+
     companion object {
         const val TIPO_APERTURA = "APERTURA"
         const val TIPO_INGRESO_VENTA = "INGRESO_VENTA"

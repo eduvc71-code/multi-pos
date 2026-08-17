@@ -17,6 +17,7 @@ import com.multipos.app.data.AuthRepository
 import com.multipos.app.data.DatabaseProvider
 import com.multipos.app.data.UserSessionStore
 import com.multipos.app.data.entities.Usuario
+import com.multipos.app.R
 import com.multipos.app.security.PasswordHasher
 import com.multipos.app.ui.home.HomeActivity
 import com.multipos.app.ui.login.LoginActivity
@@ -98,7 +99,7 @@ class LoginComposeActivity : ComponentActivity() {
                 isLoading = false
                 Toast.makeText(
                     this@LoginComposeActivity, 
-                    getString(com.multipos.app.R.string.login_blocked, mins), 
+                    getString(R.string.login_blocked, mins.toInt()), 
                     Toast.LENGTH_LONG
                 ).show()
                 return@launch

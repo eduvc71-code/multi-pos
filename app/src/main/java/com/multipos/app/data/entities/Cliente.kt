@@ -36,4 +36,5 @@ data class Cliente(
     }
 
     val creditoDisponible: Long get() = (limiteCredito - creditoActual).coerceAtLeast(0)
+    val deuda: Long get() = creditoActual
 }

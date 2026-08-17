@@ -22,6 +22,9 @@ data class Venta(
     val fechaAnulacion: Long? = null,
     val motivoAnulacion: String? = null
 ) {
+    val folio: String get() = id.toString().padStart(6, '0')
+    val clienteNombre: String get() = "Cliente #$idCliente"
+
     companion object {
         const val ESTADO_COMPLETADA = "COMPLETADA"
         const val ESTADO_ANULADA = "ANULADA"

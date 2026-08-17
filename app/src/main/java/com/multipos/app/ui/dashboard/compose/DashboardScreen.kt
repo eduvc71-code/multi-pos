@@ -11,8 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.ui.theme.onBackgroundVariant
 import com.multipos.app.util.Money
 
 @Composable
@@ -179,5 +182,17 @@ fun DashboardScreen(
                 modifier = Modifier.padding(16.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DashboardScreenPreview() {
+    MultiPOSTheme {
+        DashboardScreen(
+            totalSalesToday = 125050,
+            totalProducts = 45,
+            lowStockCount = 3
+        )
     }
 }

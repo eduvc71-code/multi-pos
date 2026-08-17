@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.Venta
 import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.components.MultiPOSSearchField
 import com.multipos.app.util.Money
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,6 +23,9 @@ import java.util.*
 @Composable
 fun HistoryScreen(
     sales: List<Venta>,
+    searchQuery: String,
+    isLoading: Boolean,
+    onSearchChange: (String) -> Unit,
     totalToday: Long,
     onSaleClick: (Venta) -> Unit,
     modifier: Modifier = Modifier
@@ -29,6 +33,7 @@ fun HistoryScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -38,6 +43,13 @@ fun HistoryScreen(
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground
+        )
+        
+        // Buscador
+        MultiPOSSearchField(
+            value = searchQuery,
+            onValueChange = onSearchChange,
+            placeholder = "Buscar por folio o cliente..."
         )
         
         // Card resumen del día
@@ -86,7 +98,14 @@ fun HistoryScreen(
         }
         
         // Lista de ventas
-        if (sales.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (sales.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

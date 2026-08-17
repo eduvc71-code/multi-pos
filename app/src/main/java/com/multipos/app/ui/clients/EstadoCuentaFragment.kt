@@ -57,7 +57,23 @@ class EstadoCuentaFragment : Fragment() {
         binding.btnRegistrarAbono.setOnClickListener { showRegisterAbonoDialog() }
         binding.btnExportarCSV.setOnClickListener { export(true) }
         binding.btnExportarPDF.setOnClickListener { export(false) }
+        
+        setupAutoScroll()
+        
         return binding.root
+    }
+
+    private fun setupAutoScroll() {
+        val inputs = listOf(binding.etDesde, binding.etHasta)
+        inputs.forEach { input ->
+            input.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) {
+                    view.postDelayed({
+                        binding.nestedScroll.smoothScrollTo(0, view.top - 20)
+                    }, 400)
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

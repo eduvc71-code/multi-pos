@@ -10,10 +10,14 @@ import java.util.Date
 import java.util.Locale
 
 data class ReportRow(
+    val id: Int = 0,
     val fecha: String,
     val categoria: String,
     val concepto: String,
-    val importe: Long
+    val importe: Long,
+    val descripcion: String = concepto,
+    val cantidad: Int = 1,
+    val total: Long = importe
 )
 
 data class ReportSummary(val totals: Map<String, Long>) {
@@ -23,7 +27,11 @@ data class ReportSummary(val totals: Map<String, Long>) {
 data class ReportData(
     val rows: List<ReportRow>,
     val summary: ReportSummary,
-    val flags: Set<String> = emptySet()
+    val flags: Set<String> = emptySet(),
+    val totalVentas: Long = 0,
+    val totalGanancia: Long = 0,
+    val totalVentasCount: Int = 0,
+    val rentabilidad: Double = 0.0
 )
 
 enum class Unidad { MONEDA, UNIDADES }

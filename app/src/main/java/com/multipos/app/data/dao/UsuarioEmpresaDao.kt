@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.multipos.app.data.entities.Empresa
+import com.multipos.app.data.entities.Usuario
 import com.multipos.app.data.entities.UsuarioEmpresa
 import kotlinx.coroutines.flow.Flow
 
@@ -32,4 +33,7 @@ interface UsuarioEmpresaDao {
 
     @Query("UPDATE usuarios SET activo = 1 WHERE id = :userId")
     suspend fun reactivateUserAccount(userId: Int): Int
+
+    @Query("SELECT u.* FROM usuarios u INNER JOIN usuario_empresas ue ON ue.usuarioId = u.id WHERE ue.empresaId = :companyId AND ue.activo = 1")
+    fun getUsersForCompany(companyId: String): Flow<List<Usuario>>
 }
