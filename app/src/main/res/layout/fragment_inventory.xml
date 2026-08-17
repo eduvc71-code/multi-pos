@@ -1,24 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    android:padding="14dp">
+
     <TextView
-        android:text="Inventario"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/btnAddProduct"
-        android:text="Nuevo producto"
-        android:layout_marginHorizontal="16dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:text="@string/menu_inventory"
+        android:textColor="@color/text_primary"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- Action Buttons Row -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddProduct"
+            style="@style/Widget.MultiPOS.Button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:text="@string/new_product"
+            android:textSize="12sp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_inventory"
+            app:iconGravity="textStart"
+            app:iconPadding="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnScanInventory"
+            style="@style/Widget.MultiPOS.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:text="@string/scan_code"
+            android:textSize="12sp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_qr_code"
+            app:iconGravity="textStart"
+            app:iconPadding="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddMovement"
+            style="@style/Widget.MultiPOS.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:text="@string/inventory_movement_button"
+            android:textSize="12sp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_cash"
+            app:iconGravity="textStart"
+            app:iconPadding="4dp" />
+    </LinearLayout>
+
+    <!-- Search Bar -->
+    <EditText
+        android:id="@+id/etInventorySearch"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_surface_card"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="10dp"
+        android:drawableTint="@color/text_muted"
+        android:hint="@string/search_product"
+        android:inputType="text"
+        android:paddingHorizontal="14dp"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_muted"
+        android:textSize="14sp" />
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerInventory"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 </LinearLayout>

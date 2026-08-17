@@ -14,5 +14,5 @@ class PosViewModel : ViewModel() {
     val cartItems: LiveData<List<CartItem>> = _cartItems  
     init { _cartItems.value = emptyList() }  
     fun loadProducts() { _products.value = emptyList() }  
-    fun getTotalAmount(): Double = 0.0  
+    fun getTotalAmount(): Long = 0
 } 

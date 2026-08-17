@@ -3,14 +3,15 @@ package com.multipos.app.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.graphics.Color
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.multipos.app.R
+import com.multipos.app.data.ActiveCompanyStore
 import com.multipos.app.data.entities.Producto
-import java.text.NumberFormat
-import java.util.Locale
+import com.multipos.app.util.Money
 
 class ProductAdapter(private val onItemClick: (Producto) -> Unit) :
     ListAdapter<Producto, ProductAdapter.ProductViewHolder>(DiffCallback()) {
@@ -25,8 +26,10 @@ class ProductAdapter(private val onItemClick: (Producto) -> Unit) :
         private val stock: TextView = view.findViewById(R.id.txtStock)
         fun bind(product: Producto) {
             name.text = product.nombre
-            price.text = NumberFormat.getCurrencyInstance(Locale.getDefault()).format(product.precioVenta)
+            price.text = Money.format(product.precioVenta)
+            price.setTextColor(runCatching { Color.parseColor(ActiveCompanyStore.color(itemView.context)) }.getOrDefault(Color.rgb(37, 99, 235)))
             stock.text = itemView.context.getString(R.string.stock_format, product.stock)
+            stock.setTextColor(when { product.stock <= 0 -> Color.rgb(183, 28, 28); product.stock <= product.stockMinimo -> Color.rgb(245, 127, 23); else -> Color.rgb(27, 94, 32) })
             itemView.setOnClickListener { onItemClick(product) }
         }
     }

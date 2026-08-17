@@ -1,12 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout android:orientation="horizontal" android:padding="8dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <Button android:id="@+id/btnSales" android:text="Ventas" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-        <Button android:id="@+id/btnInventory" android:text="Inventario" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-        <Button android:id="@+id/btnHistory" android:text="Historial" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-        <Button android:id="@+id/btnClients" android:text="Clientes" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <FrameLayout android:id="@+id/homeContainer" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
-</FrameLayout>
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- Top Workspace & Session Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MultiPOS.Card"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.08"
+                    android:text="@string/workspace_label"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogout"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="@string/logout"
+                    android:textColor="@color/error"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompany"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="start|center_vertical"
+                android:paddingHorizontal="14dp"
+                android:text="@string/company_default"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/surface_variant"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_business"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconTint="@color/primary" />
+
+            <TextView
+                android:id="@+id/txtSessionUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableStart="@drawable/ic_person"
+                android:drawablePadding="6dp"
+                android:drawableTint="@color/text_muted"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Navigation Bar with Rounded Chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="2dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDashboard"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_dashboard"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_analytics"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSales"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_pos"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_shopping_cart"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInventory"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_inventory"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_inventory"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHistory"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_history"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_history"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClients"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_clients"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_people"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEmployees"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_employees"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_badge"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCash"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_cash"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_cash"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReports"
+                style="@style/Widget.MultiPOS.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/menu_reports"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_analytics"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Content Fragment Container -->
+    <FrameLayout
+        android:id="@+id/homeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1" />
+</LinearLayout>
