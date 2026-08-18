@@ -7,32 +7,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Spinner
 import android.widget.Toast
-import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.multipos.app.R
 import com.multipos.app.data.ActiveCompanyStore
 import com.multipos.app.data.AppDatabase
 import com.multipos.app.data.DatabaseProvider
-import com.multipos.app.data.InventoryMovementException
 import com.multipos.app.data.InventoryMovementRepository
 import com.multipos.app.data.InventoryMovementRequest
 import com.multipos.app.data.entities.MovimientoInventario
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.security.ActiveCompanyAccess
 import com.multipos.app.security.CompanyPermission
+import com.multipos.app.ui.components.MultiPOSTextField
 import com.multipos.app.ui.inventory.compose.InventoryScreen
 import com.multipos.app.ui.scanner.ScannerActivity
 import com.multipos.app.ui.theme.MultiPOSTheme
@@ -44,6 +45,10 @@ import kotlinx.coroutines.launch
 class InventoryFragment : Fragment() {
     private lateinit var viewModel: InventoryViewModel
     private var scanConsumer: ((String, String) -> Unit)? = null
+
+    private var showProductDialog by mutableStateOf(false)
+    private var showMovementDialog by mutableStateOf(false)
+    private var selectedProduct by mutableStateOf<Producto?>(null)
 
     private val scannerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -65,6 +70,7 @@ class InventoryFragment : Fragment() {
             setContent {
                 MultiPOSTheme {
                     val state by viewModel.uiState.collectAsState()
+                    
                     InventoryScreen(
                         products = state.filteredProducts,
                         searchQuery = state.searchQuery,
@@ -73,234 +79,255 @@ class InventoryFragment : Fragment() {
                         onAddProductClick = {
                             viewLifecycleOwner.lifecycleScope.launch {
                                 if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                                    showProductDialog(null, db)
+                                    selectedProduct = null
+                                    showProductDialog = true
                                 }
                             }
                         },
                         onEditProductClick = { product ->
-                            showProductDialog(product, db)
+                            selectedProduct = product
+                            showProductDialog = true
                         },
                         onDeleteProductClick = { product ->
                             confirmDeleteProduct(product, db)
                         },
                         onMovementsClick = {
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                                    showMovementDialog(db, companyId, viewModel.uiState.value.products)
-                                }
-                            }
+                            showMovementDialog = true
                         },
                         onScanClick = {
-                            scanConsumer = { code, _ ->
-                                viewModel.onSearchQueryChange(code)
-                            }
+                            scanConsumer = { code, _ -> viewModel.onSearchQueryChange(code) }
                             openScanner("Buscar producto")
                         }
                     )
+
+                    if (showProductDialog) {
+                        ProductDialog(
+                            product = selectedProduct,
+                            onDismiss = { showProductDialog = false },
+                            onSave = { name, code, barcode, price, cost, stock ->
+                                saveProduct(db, name, code, barcode, price, cost, stock)
+                            },
+                            onScan = { consumer ->
+                                scanConsumer = consumer
+                                openScanner("Escanear código")
+                            }
+                        )
+                    }
+                    if (showMovementDialog) {
+                        MovementDialog(
+                            products = state.products,
+                            onDismiss = { showMovementDialog = false },
+                            onSave = { product, tipo, cantidad, motivo ->
+                                registerMovement(db, companyId, product, tipo, cantidad, motivo)
+                            }
+                        )
+                    }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun MovementDialog(
+        products: List<Producto>,
+        onDismiss: () -> Unit,
+        onSave: (Producto, String, Int, String) -> Unit
+    ) {
+        if (products.isEmpty()) {
+            Toast.makeText(requireContext(), "No hay productos", Toast.LENGTH_SHORT).show()
+            onDismiss()
+            return
+        }
+
+        var selectedProduct by remember { mutableStateOf(products[0]) }
+        var expandedProduct by remember { mutableStateOf(false) }
+        
+        val types = listOf(
+            MovimientoInventario.TIPO_ENTRADA_MANUAL to "Entrada manual",
+            MovimientoInventario.TIPO_SALIDA_MANUAL to "Salida manual",
+            MovimientoInventario.TIPO_AJUSTE to "Ajuste de inventario"
+        )
+        var selectedType by remember { mutableStateOf(types[0]) }
+        var expandedType by remember { mutableStateOf(false) }
+        
+        var cantidad by remember { mutableStateOf("") }
+        var motivo by remember { mutableStateOf("") }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Movimiento de Inventario") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val cant = cantidad.toIntOrNull() ?: 0
+                    if (cant != 0 && motivo.length >= 5) {
+                        onSave(selectedProduct, selectedType.first, cant, motivo)
+                    } else {
+                        Toast.makeText(requireContext(), "Verifique los datos", Toast.LENGTH_SHORT).show()
+                    }
+                }) { Text("Guardar") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Selector de Producto
+                    Box {
+                        OutlinedButton(onClick = { expandedProduct = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Producto: ${selectedProduct.nombre}")
+                        }
+                        DropdownMenu(expanded = expandedProduct, onDismissRequest = { expandedProduct = false }) {
+                            products.forEach { p ->
+                                DropdownMenuItem(text = { Text(p.nombre) }, onClick = { selectedProduct = p; expandedProduct = false })
+                            }
+                        }
+                    }
+
+                    // Selector de Tipo
+                    Box {
+                        OutlinedButton(onClick = { expandedType = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Tipo: ${selectedType.second}")
+                        }
+                        DropdownMenu(expanded = expandedType, onDismissRequest = { expandedType = false }) {
+                            types.forEach { t ->
+                                DropdownMenuItem(text = { Text(t.second) }, onClick = { selectedType = t; expandedType = false })
+                            }
+                        }
+                    }
+
+                    MultiPOSTextField(
+                        value = cantidad,
+                        onValueChange = { cantidad = it },
+                        label = if (selectedType.first == MovimientoInventario.TIPO_AJUSTE) "Nuevo stock" else "Cantidad"
+                    )
+
+                    MultiPOSTextField(value = motivo, onValueChange = { motivo = it }, label = "Motivo (mín. 5 car.)")
+                }
+            }
+        )
+    }
+
+    private fun registerMovement(db: AppDatabase, companyId: String, product: Producto, tipo: String, cantidad: Int, motivo: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                InventoryMovementRepository(db).registerMovement(
+                    InventoryMovementRequest(
+                        companyId = companyId,
+                        productId = product.id,
+                        userId = com.multipos.app.data.UserSessionStore.userId(requireContext()),
+                        tipo = tipo,
+                        cantidad = cantidad,
+                        motivo = motivo
+                    )
+                )
+                showMovementDialog = false
+                Toast.makeText(context, "Movimiento registrado", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    @Composable
+    private fun ProductDialog(
+        product: Producto?,
+        onDismiss: () -> Unit,
+        onSave: (String, String, String?, Long, Long, Int) -> Unit,
+        onScan: (((String, String) -> Unit)) -> Unit
+    ) {
+        var name by remember { mutableStateOf(product?.nombre ?: "") }
+        var code by remember { mutableStateOf(product?.codigo ?: "") }
+        var barcode by remember { mutableStateOf(product?.codigoBarras ?: "") }
+        var price by remember { mutableStateOf(if (product != null) (product.precioVenta / 100.0).toString() else "") }
+        var cost by remember { mutableStateOf(if (product != null) (product.costoUnitario / 100.0).toString() else "") }
+        var stock by remember { mutableStateOf(product?.stock?.toString() ?: "0") }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = {
+                    val p = Money.parseMinorUnits(price) ?: 0L
+                    val c = Money.parseMinorUnits(cost) ?: 0L
+                    val s = stock.toIntOrNull() ?: 0
+                    onSave(name, code, barcode.ifBlank { null }, p, c, s)
+                }) { Text("Guardar") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+            title = { Text(if (product == null) "Nuevo Producto" else "Editar Producto") },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    MultiPOSTextField(value = name, onValueChange = { name = it }, label = "Nombre")
+                    MultiPOSTextField(value = code, onValueChange = { code = it }, label = "Código Interno")
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        MultiPOSTextField(
+                            value = barcode, 
+                            onValueChange = { barcode = it }, 
+                            label = "Código de Barras",
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { 
+                            onScan { c, _ -> barcode = c }
+                        }) {
+                            Icon(Icons.Default.QrCodeScanner, contentDescription = "Escanear")
+                        }
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MultiPOSTextField(value = price, onValueChange = { price = it }, label = "Precio", modifier = Modifier.weight(1f))
+                        MultiPOSTextField(value = cost, onValueChange = { cost = it }, label = "Costo", modifier = Modifier.weight(1f))
+                    }
+                    MultiPOSTextField(value = stock, onValueChange = { stock = it }, label = "Stock inicial")
+                }
+            }
+        )
+    }
+
+    private fun saveProduct(db: AppDatabase, name: String, code: String, barcode: String?, price: Long, cost: Long, stock: Int) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val companyId = ActiveCompanyStore.get(requireContext())
+            val product = Producto(
+                id = selectedProduct?.id ?: 0,
+                nombre = name,
+                codigo = code,
+                codigoBarras = barcode,
+                precioVenta = price,
+                costoUnitario = cost,
+                stock = stock,
+                empresaId = companyId,
+                categoria = selectedProduct?.categoria ?: "General",
+                stockMinimo = selectedProduct?.stockMinimo ?: 5
+            )
+            try {
+                if (selectedProduct == null) db.productoDao().insert(product)
+                else db.productoDao().update(product)
+                showProductDialog = false
+                Toast.makeText(context, "Producto guardado", Toast.LENGTH_SHORT).show()
+            } catch (e: SQLiteConstraintException) {
+                Toast.makeText(context, "Código ya existe", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun confirmDeleteProduct(product: Producto, db: AppDatabase) {
-        AlertDialog.Builder(requireContext())
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("Eliminar producto")
-            .setMessage("Esta acción no se puede deshacer.")
-            .setNegativeButton("Cancelar", null)
+            .setMessage("¿Estás seguro?")
             .setPositiveButton("Eliminar") { _, _ ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    if (!ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                        Toast.makeText(requireContext(), "No tienes permiso para eliminar productos", Toast.LENGTH_LONG).show()
-                        return@launch
-                    }
-                    if (db.productoDao().archive(product.id, product.empresaId) == 1) {
-                        Toast.makeText(requireContext(), "Producto eliminado", Toast.LENGTH_SHORT).show()
-                    }
+                    db.productoDao().archive(product.id, product.empresaId)
+                    Toast.makeText(requireContext(), "Eliminado", Toast.LENGTH_SHORT).show()
                 }
             }
-            .show()
-    }
-
-    private fun showProductDialog(existing: Producto?, db: AppDatabase, scannedBarcode: String? = null, scannedFormat: String? = null) {
-        val fields = listOf("Nombre", "Código interno", "Código de barras (opcional)", "Precio de venta", "Costo unitario", "Stock")
-        val inputs = fields.map { EditText(requireContext()).apply { hint = it; setPadding(24, 12, 24, 12) } }
-        existing?.let {
-            inputs[0].setText(it.nombre)
-            inputs[1].setText(it.codigo)
-            inputs[2].setText(it.codigoBarras.orEmpty())
-            inputs[3].setText(Money.toInput(it.precioVenta))
-            inputs[4].setText(Money.toInput(it.costoUnitario))
-            inputs[5].setText(it.stock.toString())
-        }
-        if (existing == null && scannedBarcode != null) inputs[2].setText(scannedBarcode)
-        val scanButton = Button(requireContext()).apply { text = getString(R.string.scan_code_camera) }
-        val form = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
-            inputs.forEach(::addView)
-            addView(scanButton)
-        }
-        val builder = AlertDialog.Builder(requireContext())
-            .setTitle(if (existing == null) "Nuevo producto" else "Editar producto")
-            .setView(form)
             .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Guardar", null)
-        if (existing != null) builder.setNeutralButton("Eliminar", null)
-        val dialog = builder.create()
-        scanButton.setOnClickListener {
-            scanConsumer = { code, _ -> inputs[2].setText(code) }
-            openScanner("Código del producto")
-        }
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val name = inputs[0].text.toString().trim()
-                val code = inputs[1].text.toString().trim()
-                val barcode = inputs[2].text.toString().trim().ifEmpty { null }
-                val price = Money.parseMinorUnits(inputs[3].text.toString())
-                val cost = Money.parseMinorUnits(inputs[4].text.toString())
-                val stock = inputs[5].text.toString().toIntOrNull()
-                if (name.isBlank() || code.isBlank() || price == null || cost == null || stock == null || stock < 0) {
-                    Toast.makeText(requireContext(), "Completa los datos correctamente", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                saveButton.isEnabled = false
-                viewLifecycleOwner.lifecycleScope.launch {
-                    if (!ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                        saveButton.isEnabled = true
-                        Toast.makeText(requireContext(), "Ya no tienes permiso para guardar productos", Toast.LENGTH_LONG).show()
-                        return@launch
-                    }
-                    val product = Producto(
-                        id = existing?.id ?: 0,
-                        nombre = name,
-                        codigo = code,
-                        precioVenta = price,
-                        costoUnitario = cost,
-                        stock = stock,
-                        stockMinimo = existing?.stockMinimo ?: 5,
-                        categoria = existing?.categoria ?: "General",
-                        fotoUrl = existing?.fotoUrl ?: "",
-                        codigoBarras = barcode,
-                        tipoCodigo = if (barcode != null) (scannedFormat ?: existing?.tipoCodigo) else null,
-                        empresaId = existing?.empresaId ?: ActiveCompanyStore.get(requireContext())
-                    )
-                    try {
-                        if (existing == null) db.productoDao().insert(product) else db.productoDao().update(product)
-                        dialog.dismiss()
-                        Toast.makeText(requireContext(), "Producto guardado", Toast.LENGTH_SHORT).show()
-                    } catch (_: SQLiteConstraintException) {
-                        Toast.makeText(requireContext(), "El código interno o de barras ya está registrado", Toast.LENGTH_LONG).show()
-                    } catch (_: Exception) {
-                        Toast.makeText(requireContext(), "No se pudo guardar el producto. Intenta nuevamente.", Toast.LENGTH_LONG).show()
-                    } finally {
-                        if (dialog.isShowing) saveButton.isEnabled = true
-                    }
-                }
-            }
-            if (existing != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                confirmDeleteProduct(existing, db)
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
+            .show()
     }
 
     private fun openScanner(title: String) {
         scannerLauncher.launch(Intent(requireContext(), ScannerActivity::class.java).putExtra(ScannerActivity.EXTRA_TITLE, title))
-    }
-
-    private fun showMovementDialog(
-        db: AppDatabase,
-        companyId: String,
-        catalog: List<Producto>
-    ) {
-        if (catalog.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.empty_products, Toast.LENGTH_SHORT).show()
-            return
-        }
-        val context = requireContext()
-        val productSpinner = Spinner(context).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, catalog.map { it.nombre })
-        }
-        val typeSpinner = Spinner(context).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, listOf(
-                getString(R.string.inventory_movement_tipo_entrada),
-                getString(R.string.inventory_movement_tipo_salida),
-                getString(R.string.inventory_movement_tipo_ajuste)
-            ))
-        }
-        val quantityInput = EditText(context).apply {
-            hint = getString(R.string.inventory_movement_cantidad_hint)
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED
-        }
-        val reasonInput = EditText(context).apply {
-            hint = getString(R.string.inventory_movement_motivo_hint)
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            minLines = 2
-        }
-        typeSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
-                quantityInput.hint = getString(
-                    if (position == 2) R.string.inventory_movement_ajuste_hint
-                    else R.string.inventory_movement_cantidad_hint
-                )
-            }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
-        }
-        val form = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            addView(productSpinner)
-            addView(typeSpinner)
-            addView(quantityInput)
-            addView(reasonInput)
-        }
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(R.string.inventory_movement_title)
-            .setView(form)
-            .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Guardar", null)
-            .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val product = catalog[productSpinner.selectedItemPosition]
-                val tipo = when (typeSpinner.selectedItemPosition) {
-                    0 -> MovimientoInventario.TIPO_ENTRADA_MANUAL
-                    1 -> MovimientoInventario.TIPO_SALIDA_MANUAL
-                    else -> MovimientoInventario.TIPO_AJUSTE
-                }
-                val cantidad = quantityInput.text.toString().toIntOrNull()
-                val motivo = reasonInput.text.toString().trim()
-                if (cantidad == null || cantidad == 0) {
-                    Toast.makeText(context, R.string.inventory_movement_cantidad_hint, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                if (motivo.length !in 5..300) {
-                    Toast.makeText(context, R.string.inventory_movement_motivo_hint, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                val confirmButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                confirmButton.isEnabled = false
-                viewLifecycleOwner.lifecycleScope.launch {
-                    try {
-                        InventoryMovementRepository(db).registerMovement(
-                            InventoryMovementRequest(
-                                companyId = companyId,
-                                productId = product.id,
-                                userId = com.multipos.app.data.UserSessionStore.userId(requireContext()),
-                                tipo = tipo,
-                                cantidad = cantidad,
-                                motivo = motivo
-                            )
-                        )
-                        dialog.dismiss()
-                        Toast.makeText(context, R.string.inventory_movement_saved, Toast.LENGTH_SHORT).show()
-                    } catch (error: InventoryMovementException) {
-                        confirmButton.isEnabled = true
-                        Toast.makeText(context, error.message ?: getString(R.string.inventory_movement_error), Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }
-        dialog.show()
     }
 }

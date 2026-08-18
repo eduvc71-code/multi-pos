@@ -1,18 +1,19 @@
 package com.multipos.app.ui.cash
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -24,8 +25,8 @@ import com.multipos.app.data.UserSessionStore
 import com.multipos.app.data.entities.MovimientoCaja
 import com.multipos.app.data.entities.Usuario
 import com.multipos.app.security.ActiveCompanyAccess
-import com.multipos.app.security.CompanyPermission
 import com.multipos.app.ui.cash.compose.CashScreen
+import com.multipos.app.ui.components.MultiPOSTextField
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 import com.multipos.app.viewmodel.CashViewModel
@@ -35,7 +36,12 @@ import kotlinx.coroutines.launch
 class CashFragment : Fragment() {
     private lateinit var viewModel: CashViewModel
     private var currentUserId: Int = 0
-    private var canManageManualMovements = false
+    private var canManageManualMovements by mutableStateOf(false)
+
+    private var showOpenDialog by mutableStateOf(false)
+    private var showCloseDialog by mutableStateOf(false)
+    private var showMovementDialog by mutableStateOf(false)
+    private var movementType by mutableStateOf("")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val db = DatabaseProvider.get(requireContext())
@@ -63,161 +69,126 @@ class CashFragment : Fragment() {
                         movements = state.movements,
                         isCashOpen = state.session != null,
                         isLoading = state.isLoading,
-                        onOpenCashClick = { showOpenDialog() },
-                        onCloseCashClick = { showCloseDialog() },
-                        onAddIncomeClick = { showMovementDialog(MovimientoCaja.TIPO_INGRESO_MANUAL) },
-                        onAddExpenseClick = { showMovementDialog(MovimientoCaja.TIPO_EGRESO_MANUAL) }
+                        onOpenCashClick = { showOpenDialog = true },
+                        onCloseCashClick = { showCloseDialog = true },
+                        onAddIncomeClick = { 
+                            movementType = MovimientoCaja.TIPO_INGRESO_MANUAL
+                            showMovementDialog = true 
+                        },
+                        onAddExpenseClick = { 
+                            movementType = MovimientoCaja.TIPO_EGRESO_MANUAL
+                            showMovementDialog = true 
+                        }
                     )
+
+                    if (showOpenDialog) {
+                        OpenCashDialog(onDismiss = { showOpenDialog = false })
+                    }
+
+                    if (showCloseDialog) {
+                        CloseCashDialog(
+                            expected = state.expected,
+                            onDismiss = { showCloseDialog = false }
+                        )
+                    }
+
+                    if (showMovementDialog) {
+                        ManualMovementDialog(
+                            tipo = movementType,
+                            onDismiss = { showMovementDialog = false }
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun showOpenDialog() {
-        val context = requireContext()
-        val amountInput = EditText(context).apply {
-            hint = getString(R.string.cash_hint_apertura)
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-        }
-        val form = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 12, 48, 0)
-            addView(amountInput)
-        }
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("Abrir caja")
-            .setMessage("Ingrese el monto inicial de efectivo en caja.")
-            .setView(form)
-            .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Abrir", null)
-            .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val raw = amountInput.text.toString()
-                val monto = Money.parseMinorUnits(raw)
-                if (monto == null || monto < 0) {
-                    Toast.makeText(context, getString(R.string.cash_error_monto_invalid), Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                viewModel.openSession(monto)
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
+    @Composable
+    private fun OpenCashDialog(onDismiss: () -> Unit) {
+        var monto by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Abrir Caja") },
+            text = {
+                MultiPOSTextField(value = monto, onValueChange = { monto = it }, label = "Monto de apertura")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val valMonto = Money.parseMinorUnits(monto)
+                    if (valMonto != null && valMonto >= 0) {
+                        viewModel.openSession(valMonto)
+                        onDismiss()
+                    } else {
+                        Toast.makeText(context, "Monto inválido", Toast.LENGTH_SHORT).show()
+                    }
+                }) { Text("Abrir") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        )
     }
 
-    private fun showMovementDialog(tipo: String) {
-        if (!canManageManualMovements) {
-            Toast.makeText(requireContext(), "No tienes permiso para registrar movimientos manuales", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val context = requireContext()
-        val amountInput = EditText(context).apply {
-            hint = getString(R.string.cash_hint_monto)
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-        }
-        val conceptInput = EditText(context).apply {
-            hint = getString(R.string.cash_hint_concepto)
-            inputType = InputType.TYPE_CLASS_TEXT
-        }
-        val form = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 12, 48, 0)
-            addView(amountInput); addView(conceptInput)
-        }
-        val title = if (tipo == MovimientoCaja.TIPO_INGRESO_MANUAL) "Ingreso manual" else "Egreso manual"
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(title)
-            .setView(form)
-            .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Guardar", null)
-            .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val raw = amountInput.text.toString()
-                val monto = Money.parseMinorUnits(raw)
-                val concepto = conceptInput.text.toString().trim()
-                if (monto == null || monto <= 0) {
-                    Toast.makeText(context, getString(R.string.cash_error_monto_invalid), Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+    @Composable
+    private fun CloseCashDialog(expected: Long, onDismiss: () -> Unit) {
+        var contado by remember { mutableStateOf("") }
+        var nota by remember { mutableStateOf("") }
+        
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Cerrar Caja") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Total esperado: ${Money.format(expected)}")
+                    MultiPOSTextField(value = contado, onValueChange = { contado = it }, label = "Efectivo en caja")
+                    MultiPOSTextField(value = nota, onValueChange = { nota = it }, label = "Nota (obligatoria si hay diferencia)")
                 }
-                if (concepto.length < 3 || concepto.length > 200) {
-                    Toast.makeText(context, getString(R.string.cash_error_concepto_invalid), Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                viewModel.addManualMovement(tipo, monto, concepto)
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val valContado = Money.parseMinorUnits(contado)
+                    if (valContado != null && valContado >= 0) {
+                        val diff = valContado - expected
+                        if (diff != 0L && nota.trim().length < 5) {
+                            Toast.makeText(context, "La nota es obligatoria cuando hay diferencia", Toast.LENGTH_SHORT).show()
+                        } else {
+                            viewModel.closeSession(valContado, nota)
+                            onDismiss()
+                        }
+                    } else {
+                        Toast.makeText(context, "Monto inválido", Toast.LENGTH_SHORT).show()
+                    }
+                }) { Text("Cerrar") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        )
     }
 
-    private fun showCloseDialog() {
-        val state = viewModel.uiState.value
-        if (state.session == null) return
-        if (!canManageManualMovements && state.session.abiertaPorUsuarioId != currentUserId) {
-            Toast.makeText(requireContext(), "No tienes permiso para cerrar esta sesión de caja", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val context = requireContext()
-        val countInput = EditText(context).apply {
-            hint = getString(R.string.cash_hint_conteo)
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-        }
-        val noteInput = EditText(context).apply {
-            hint = "Nota del cierre"
-            inputType = InputType.TYPE_CLASS_TEXT
-        }
-        val form = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 12, 48, 0)
-            addView(countInput); addView(noteInput)
-        }
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("Cerrar caja")
-            .setMessage("Ingrese el conteo de efectivo. La nota es obligatoria si existe diferencia.")
-            .setView(form)
-            .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Cerrar", null)
-            .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val raw = countInput.text.toString()
-                val contado = Money.parseMinorUnits(raw)
-                val nota = noteInput.text.toString().trim()
-                if (contado == null || contado < 0) {
-                    Toast.makeText(context, getString(R.string.cash_error_monto_invalid), Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+    @Composable
+    private fun ManualMovementDialog(tipo: String, onDismiss: () -> Unit) {
+        var monto by remember { mutableStateOf("") }
+        var concepto by remember { mutableStateOf("") }
+        val title = if (tipo == MovimientoCaja.TIPO_INGRESO_MANUAL) "Ingreso Manual" else "Egreso Manual"
+        
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(title) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MultiPOSTextField(value = monto, onValueChange = { monto = it }, label = "Monto")
+                    MultiPOSTextField(value = concepto, onValueChange = { concepto = it }, label = "Concepto")
                 }
-                val expected = viewModel.uiState.value.expected
-                val difference = contado - expected
-                if (nota.length > 300 || (difference != 0L && nota.length !in 5..300)) {
-                    Toast.makeText(context, "La nota debe tener entre 5 y 300 caracteres cuando existe diferencia", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                dialog.dismiss()
-                confirmClose(contado, nota)
-            }
-        }
-        dialog.show()
-    }
-
-    private fun confirmClose(contado: Long, nota: String) {
-        val state = viewModel.uiState.value
-        val difference = contado - state.expected
-        val message = buildString {
-            append("Ingresos: ${Money.format(state.ingresos)}\n")
-            append("Egresos: ${Money.format(state.egresos)}\n")
-            append("Esperado: ${Money.format(state.expected)}\n")
-            append("Contado: ${Money.format(contado)}\n")
-            append("Diferencia: ${Money.format(difference)}")
-        }
-        AlertDialog.Builder(requireContext())
-            .setTitle("Confirmar cierre de caja")
-            .setMessage(message)
-            .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Cerrar caja") { _, _ -> viewModel.closeSession(contado, nota) }
-            .show()
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val valMonto = Money.parseMinorUnits(monto)
+                    if (valMonto != null && valMonto > 0 && concepto.trim().length >= 3) {
+                        viewModel.addManualMovement(tipo, valMonto, concepto)
+                        onDismiss()
+                    } else {
+                        Toast.makeText(context, "Monto o concepto inválido", Toast.LENGTH_SHORT).show()
+                    }
+                }) { Text("Guardar") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        )
     }
 }

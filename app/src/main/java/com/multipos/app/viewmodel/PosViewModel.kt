@@ -5,21 +5,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.data.dao.ProductoDao
+import com.multipos.app.data.models.CartLine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-data class CartItem(
-    val product: Producto,
-    val quantity: Int
-)
-
 data class PosUiState(
     val products: List<Producto> = emptyList(),
     val filteredProducts: List<Producto> = emptyList(),
-    val cart: List<CartItem> = emptyList(),
+    val cart: List<CartLine> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = false,
     val total: Long = 0,
@@ -74,7 +70,7 @@ class PosViewModel(private val productoDao: ProductoDao, private val companyId: 
                 quantity = currentCart[existingIndex].quantity + 1
             )
         } else {
-            currentCart.add(CartItem(product, 1))
+            currentCart.add(CartLine(product, 1))
         }
         updateCart(currentCart)
     }
@@ -106,7 +102,7 @@ class PosViewModel(private val productoDao: ProductoDao, private val companyId: 
         _uiState.value = _uiState.value.copy(selectedClient = client)
     }
 
-    private fun updateCart(newCart: List<CartItem>) {
+    private fun updateCart(newCart: List<CartLine>) {
         val newTotal = newCart.sumOf { it.product.precioVenta * it.quantity }
         _uiState.value = _uiState.value.copy(cart = newCart, total = newTotal)
     }

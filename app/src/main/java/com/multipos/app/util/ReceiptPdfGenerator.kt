@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
-import com.multipos.app.adapters.CartLine
+import com.multipos.app.data.models.CartLine
 import com.multipos.app.security.QrCredentialService
 import java.io.File
 import java.text.SimpleDateFormat

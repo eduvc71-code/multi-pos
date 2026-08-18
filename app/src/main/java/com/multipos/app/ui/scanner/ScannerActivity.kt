@@ -4,15 +4,14 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.runtime.*
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -20,165 +19,128 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.multipos.app.R
-import com.multipos.app.databinding.ActivityScannerBinding
+import com.multipos.app.ui.scanner.compose.ScannerScreen
+import com.multipos.app.ui.theme.MultiPOSTheme
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ScannerActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityScannerBinding
+class ScannerActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private val analyzing = AtomicBoolean(false)
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var barcodeScanner: BarcodeScanner? = null
-    private var torchEnabled = false
+    
+    private var torchEnabled by mutableStateOf(false)
+    private var statusText by mutableStateOf("Iniciando cámara...")
     private var manualEntryAllowed = true
+    private var previewView: PreviewView? = null
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
             startCamera()
         } else {
-            resetCameraState()
-            binding.txtScannerStatus.setText(
-                if (manualEntryAllowed) R.string.scanner_permission_denied_manual else R.string.scanner_permission_denied
-            )
+            statusText = if (manualEntryAllowed) "Sin permiso de cámara. Use entrada manual." else "Sin permiso de cámara."
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityScannerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.txtScannerTitle.text = intent.getStringExtra(EXTRA_TITLE) ?: getString(R.string.scanner_title)
+        enableEdgeToEdge()
+        
+        val title = intent.getStringExtra(EXTRA_TITLE) ?: "Escanear Código"
         manualEntryAllowed = intent.getBooleanExtra(EXTRA_ALLOW_MANUAL, true)
-        binding.manualEntryContainer.visibility = if (manualEntryAllowed) View.VISIBLE else View.GONE
-        binding.btnCloseScanner.setOnClickListener { finish() }
-        binding.btnTorch.setOnClickListener {
-            val activeCamera = camera ?: return@setOnClickListener
-            if (!activeCamera.cameraInfo.hasFlashUnit()) return@setOnClickListener
 
-            val requestedState = !torchEnabled
-            val torchFuture = runCatching {
-                activeCamera.cameraControl.enableTorch(requestedState)
-            }.getOrElse { return@setOnClickListener }
-            torchFuture.addListener({
-                if (isDestroyed) return@addListener
-                runCatching { torchFuture.get() }
-                    .onSuccess {
-                        torchEnabled = requestedState
-                        binding.btnTorch.setText(if (torchEnabled) R.string.scanner_torch_off else R.string.scanner_torch)
+        setContent {
+            MultiPOSTheme {
+                ScannerScreen(
+                    title = title,
+                    statusText = statusText,
+                    manualEntryAllowed = manualEntryAllowed,
+                    torchEnabled = torchEnabled,
+                    onCloseClick = { finish() },
+                    onTorchToggle = { toggleTorch() },
+                    onManualEntry = { returnResult(it, "MANUAL") },
+                    onPreviewCreated = { 
+                        previewView = it
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startCamera()
+                        } else permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
-            }, ContextCompat.getMainExecutor(this))
+                )
+            }
         }
-        binding.btnUseManualCode.setOnClickListener {
-            val code = binding.etManualCode.text?.toString().orEmpty().trim()
-            if (code.isNotEmpty()) returnResult(code, "MANUAL")
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera()
-        } else permissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+
+    private fun toggleTorch() {
+        val activeCamera = camera ?: return
+        if (!activeCamera.cameraInfo.hasFlashUnit()) return
+
+        val newState = !torchEnabled
+        activeCamera.cameraControl.enableTorch(newState).addListener({
+            torchEnabled = newState
+        }, ContextCompat.getMainExecutor(this))
     }
 
     @androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
     private fun startCamera() {
-        val providerFuture = runCatching { ProcessCameraProvider.getInstance(this) }.getOrElse {
-            showCameraStartError()
-            return
-        }
+        val view = previewView ?: return
+        val providerFuture = ProcessCameraProvider.getInstance(this)
+        
         providerFuture.addListener({
-            if (isFinishing || isDestroyed) return@addListener
-
-            val provider = runCatching { providerFuture.get() }.getOrElse {
-                showCameraStartError()
-                return@addListener
-            }
+            val provider = providerFuture.get()
             cameraProvider = provider
-            val hasBackCamera = runCatching { provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) }
-                .getOrDefault(false)
-            if (!hasBackCamera) {
-                resetCameraState()
-                showCameraStartError()
-                return@addListener
-            }
-
-            val preview = Preview.Builder().build().also { it.setSurfaceProvider(binding.cameraPreview.surfaceProvider) }
+            
+            val preview = Preview.Builder().build().also { it.setSurfaceProvider(view.surfaceProvider) }
             val options = BarcodeScannerOptions.Builder().setBarcodeFormats(
-                Barcode.FORMAT_EAN_13,
-                Barcode.FORMAT_EAN_8,
-                Barcode.FORMAT_UPC_A,
-                Barcode.FORMAT_UPC_E,
-                Barcode.FORMAT_CODE_128,
-                Barcode.FORMAT_CODE_39,
-                Barcode.FORMAT_ITF,
-                Barcode.FORMAT_QR_CODE
+                Barcode.FORMAT_ALL_FORMATS
             ).build()
+            
             val scanner = BarcodeScanning.getClient(options)
             barcodeScanner = scanner
-            val analysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
+            
+            val analysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+            
             analysis.setAnalyzer(executor) { imageProxy ->
                 val mediaImage = imageProxy.image
                 if (mediaImage == null || !analyzing.compareAndSet(false, true)) {
                     imageProxy.close()
                     return@setAnalyzer
                 }
-                try {
-                    val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                    scanner.process(image)
-                        .addOnSuccessListener { barcodes ->
-                            barcodes.firstNotNullOfOrNull { it.rawValue?.trim()?.takeIf(String::isNotEmpty) }?.let { code ->
-                                val format = barcodes.firstOrNull { it.rawValue?.trim() == code }?.format?.toString() ?: "UNKNOWN"
-                                returnResult(code, format)
-                            }
+                
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                scanner.process(image)
+                    .addOnSuccessListener { barcodes ->
+                        barcodes.firstOrNull()?.rawValue?.let { code ->
+                            returnResult(code, barcodes.first().format.toString())
                         }
-                        .addOnCompleteListener {
-                            analyzing.set(false)
-                            imageProxy.close()
-                        }
-                } catch (_: RuntimeException) {
-                    analyzing.set(false)
-                    imageProxy.close()
-                }
+                    }
+                    .addOnCompleteListener {
+                        analyzing.set(false)
+                        imageProxy.close()
+                    }
             }
-            val boundCamera = runCatching {
+
+            try {
                 provider.unbindAll()
-                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
-            }.getOrElse {
-                analysis.clearAnalyzer()
-                resetCameraState()
-                showCameraStartError()
-                return@addListener
+                camera = provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
+                statusText = "Coloque el código en el recuadro"
+            } catch (e: Exception) {
+                statusText = "Error al iniciar cámara"
             }
-            camera = boundCamera
-            binding.txtScannerStatus.setText(R.string.scanner_instruction)
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun showCameraStartError() {
-        binding.txtScannerStatus.setText(
-            if (manualEntryAllowed) R.string.scanner_start_error_manual else R.string.scanner_start_error
-        )
-    }
-
-    private fun resetCameraState() {
-        analyzing.set(false)
-        torchEnabled = false
-        camera = null
-        runCatching { cameraProvider?.unbindAll() }
-        cameraProvider = null
-        barcodeScanner?.close()
-        barcodeScanner = null
-        binding.btnTorch.setText(R.string.scanner_torch)
-    }
-
     private fun returnResult(code: String, format: String) {
-        if (isFinishing) return
         setResult(RESULT_OK, Intent().putExtra(EXTRA_SCAN_RESULT, code).putExtra(EXTRA_SCAN_FORMAT, format))
         finish()
     }
 
     override fun onDestroy() {
-        resetCameraState()
         executor.shutdown()
+        barcodeScanner?.close()
         super.onDestroy()
     }
 

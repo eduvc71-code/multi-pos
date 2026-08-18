@@ -55,6 +55,18 @@ class ClientsViewModel(private val clienteDao: ClienteDao, private val companyId
                     it.documento?.lowercase()?.contains(lowerQuery) == true
         }
     }
+
+    fun saveClient(client: Cliente, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                if (client.id == 0) clienteDao.insert(client)
+                else clienteDao.update(client)
+                onResult(true)
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
 }
 
 class ClientsViewModelFactory(

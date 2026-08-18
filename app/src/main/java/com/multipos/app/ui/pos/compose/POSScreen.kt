@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.data.entities.Producto
+import com.multipos.app.data.models.CartLine
 import com.multipos.app.ui.components.CartItemCard
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
@@ -22,14 +23,6 @@ import com.multipos.app.ui.components.MultiPOSSearchField
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.ui.theme.success
 import com.multipos.app.ui.theme.warning
-
-data class CartLine(
-    val productId: Int,
-    val productName: String,
-    val price: Long,
-    val quantity: Int,
-    val product: Producto? = null
-)
 
 data class CartItem(
     val product: com.multipos.app.data.entities.Producto,
@@ -421,8 +414,8 @@ fun POSScreenPreview() {
         Producto(3, "Leche Entera", "PROD003", 1100, 800, 4, 10, "Lácteos", "", "7501055300099", "EAN_13", "EMP01")
     )
     val dummyCart = listOf(
-        CartLine(1, "Coca Cola 2L", 1500, 2),
-        CartLine(2, "Pan de Molde", 2200, 1)
+        CartLine(dummyProducts[0], 2),
+        CartLine(dummyProducts[1], 1)
     )
     
     MultiPOSTheme {

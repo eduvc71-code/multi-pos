@@ -49,15 +49,7 @@ class PosFragment : Fragment() {
                     val state by viewModel.uiState.collectAsState()
                     POSScreen(
                         products = state.filteredProducts,
-                        cartLines = state.cart.map { 
-                            com.multipos.app.ui.pos.compose.CartLine(
-                                productId = it.product.id,
-                                productName = it.product.nombre,
-                                price = it.product.precioVenta,
-                                quantity = it.quantity,
-                                product = it.product
-                            )
-                        },
+                        cartLines = state.cart,
                         selectedClient = state.selectedClient,
                         paymentMethod = state.paymentMethod,
                         total = state.total,
