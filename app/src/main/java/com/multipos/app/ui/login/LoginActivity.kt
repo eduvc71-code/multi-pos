@@ -22,6 +22,7 @@ import com.multipos.app.ui.home.HomeActivity
 import com.multipos.app.ui.login.compose.LoginScreen
 import com.multipos.app.ui.setup.SetupActivity
 import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.util.demo.DemoDataSeeder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +49,8 @@ class LoginActivity : ComponentActivity() {
                         isLoading = isLoading,
                         onUsernameChange = { username = it },
                         onPasswordChange = { password = it },
-                        onLoginClick = ::attemptLogin
+                        onLoginClick = ::attemptLogin,
+                        onExitClick = { finishAffinity() }
                     )
                 }
             }
@@ -57,6 +59,12 @@ class LoginActivity : ComponentActivity() {
         // Verificación inicial
         lifecycleScope.launch {
             val db = DatabaseProvider.get(this@LoginActivity)
+            
+            // Sembrar datos demo solo si no hay empresa (primera vez)
+            if (db.empresaDao().count() == 0) {
+                DemoDataSeeder.seed(db)
+            }
+            
             if (db.empresaDao().count() == 0 || db.usuarioDao().count() == 0) {
                 startActivity(Intent(this@LoginActivity, SetupActivity::class.java))
                 finish()
@@ -116,8 +124,18 @@ class LoginActivity : ComponentActivity() {
         UserSessionStore.set(this, user)
         val currentCompany = ActiveCompanyStore.get(this)
         val membership = DatabaseProvider.get(this).usuarioEmpresaDao().getActiveMembership(user.id, currentCompany)
-        if (membership == null) ActiveCompanyStore.set(this, user.empresaId)
+        if (membership == null) {
+            ActiveCompanyStore.set(this, user.empresaId)
+            val db = com.multipos.app.data.DatabaseProvider.get(this)
+            lifecycleScope.launch {
+                val company = db.empresaDao().getById(user.empresaId)
+                if (company != null) {
+                    ActiveCompanyStore.setName(this@LoginActivity, company.nombre)
+                    ActiveCompanyStore.setColor(this@LoginActivity, company.colorPrimarioHex)
+                }
+            }
+        }
         startActivity(Intent(this, HomeActivity::class.java))
-        finish()
+        finish() // Cerramos login correctamente
     }
 }

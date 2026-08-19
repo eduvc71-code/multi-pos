@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
- * Botón primario MultiPOS
+ * Botón primario MultiPOS - Estilo Fintech Executive
  */
 @Composable
 fun MultiPOSButton(
@@ -25,14 +25,15 @@ fun MultiPOSButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(14.dp),
+            .height(54.dp),
+        shape = RoundedCornerShape(16.dp), // Radio premium de 16px
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
         enabled = enabled && !showLoading
     ) {
         if (showLoading) {
@@ -43,9 +44,9 @@ fun MultiPOSButton(
             )
         } else {
             Text(
-                text = text,
+                text = text.uppercase(), // Texto en mayúsculas para look ejecutivo
                 style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Black
             )
         }
     }
@@ -65,18 +66,19 @@ fun MultiPOSOutlineButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(14.dp),
+            .height(54.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
+        border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.5.dp),
         enabled = enabled
     ) {
         Text(
-            text = text,
+            text = text.uppercase(),
             style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -98,33 +100,34 @@ fun MultiPOSLargeActionButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(if (subtitle != null) 80.dp else 64.dp),
-        shape = RoundedCornerShape(16.dp),
+            .height(if (subtitle != null) 84.dp else 64.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             contentColor = contentColor
-        )
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.size(28.dp), contentAlignment = Alignment.Center) {
                 icon()
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = text,
+                    text = text.uppercase(),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Black
                 )
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = contentColor.copy(alpha = 0.8f)
+                        color = contentColor.copy(alpha = 0.9f)
                     )
                 }
             }
@@ -142,20 +145,20 @@ fun MultiPOSSmallButton(
     modifier: Modifier = Modifier,
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.secondary,
-        contentColor = Color.Black
+        contentColor = Color.White
     )
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(40.dp),
-        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.height(42.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = colors,
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Bold
         )
     }
 }

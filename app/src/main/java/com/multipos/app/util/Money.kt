@@ -35,7 +35,10 @@ object Money {
     }
 
     fun format(minorUnits: Long, locale: Locale = Locale.getDefault()): String =
-        NumberFormat.getCurrencyInstance(locale).format(BigDecimal.valueOf(minorUnits, 2))
+        "%.2f".format(minorUnits / 100.0)
+
+    fun formatPlain(minorUnits: Long): String =
+        "%.2f".format(minorUnits / 100.0)
 
     fun toInput(minorUnits: Long): String =
         BigDecimal.valueOf(minorUnits, 2).stripTrailingZeros().toPlainString()

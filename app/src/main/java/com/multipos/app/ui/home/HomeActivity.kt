@@ -185,9 +185,12 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun logout() {
+    fun logout() {
         UserSessionStore.clear(this)
-        startActivity(Intent(this, LoginActivity::class.java))
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
         finishAffinity()
     }
 }

@@ -29,6 +29,7 @@ import com.multipos.app.data.AppDatabase
 import com.multipos.app.data.DatabaseProvider
 import com.multipos.app.data.InventoryMovementRepository
 import com.multipos.app.data.InventoryMovementRequest
+import com.multipos.app.data.api.ProductLookupService
 import com.multipos.app.data.entities.MovimientoInventario
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.security.ActiveCompanyAccess
@@ -49,6 +50,7 @@ class InventoryFragment : Fragment() {
     private var showProductDialog by mutableStateOf(false)
     private var showMovementDialog by mutableStateOf(false)
     private var selectedProduct by mutableStateOf<Producto?>(null)
+    private var isSearchingGlobal by mutableStateOf(false)
 
     private val scannerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -71,34 +73,51 @@ class InventoryFragment : Fragment() {
                 MultiPOSTheme {
                     val state by viewModel.uiState.collectAsState()
                     
-                    InventoryScreen(
-                        products = state.filteredProducts,
-                        searchQuery = state.searchQuery,
-                        isLoading = state.isLoading,
-                        onSearchChange = { viewModel.onSearchQueryChange(it) },
-                        onAddProductClick = {
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
-                                    selectedProduct = null
-                                    showProductDialog = true
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        InventoryScreen(
+                            products = state.filteredProducts,
+                            searchQuery = state.searchQuery,
+                            isLoading = state.isLoading,
+                            onSearchChange = { viewModel.onSearchQueryChange(it) },
+                            onAddProductClick = {
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    if (ActiveCompanyAccess.allows(requireContext(), db, CompanyPermission.MANAGE_INVENTORY)) {
+                                        selectedProduct = null
+                                        showProductDialog = true
+                                    }
+                                }
+                            },
+                            onEditProductClick = { product ->
+                                selectedProduct = product
+                                showProductDialog = true
+                            },
+                            onDeleteProductClick = { product ->
+                                confirmDeleteProduct(product, db)
+                            },
+                            onMovementsClick = {
+                                showMovementDialog = true
+                            },
+                            onScanClick = {
+                                openScanner(db, companyId)
+                            }
+                        )
+
+                        if (isSearchingGlobal) {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text("Consultando base de datos global...", style = MaterialTheme.typography.titleMedium)
                                 }
                             }
-                        },
-                        onEditProductClick = { product ->
-                            selectedProduct = product
-                            showProductDialog = true
-                        },
-                        onDeleteProductClick = { product ->
-                            confirmDeleteProduct(product, db)
-                        },
-                        onMovementsClick = {
-                            showMovementDialog = true
-                        },
-                        onScanClick = {
-                            scanConsumer = { code, _ -> viewModel.onSearchQueryChange(code) }
-                            openScanner("Buscar producto")
                         }
-                    )
+                    }
 
                     if (showProductDialog) {
                         ProductDialog(
@@ -107,9 +126,8 @@ class InventoryFragment : Fragment() {
                             onSave = { name, code, barcode, price, cost, stock ->
                                 saveProduct(db, name, code, barcode, price, cost, stock)
                             },
-                            onScan = { consumer ->
-                                scanConsumer = consumer
-                                openScanner("Escanear código")
+                            onScan = { 
+                                openScanner(db, companyId)
                             }
                         )
                     }
@@ -125,6 +143,43 @@ class InventoryFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun openScanner(db: AppDatabase, companyId: String) {
+        val intent = Intent(requireContext(), ScannerActivity::class.java).apply {
+            putExtra(ScannerActivity.EXTRA_TITLE, "Buscar Producto")
+        }
+        
+        scanConsumer = { code, _ ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                val localProduct = db.productoDao().getByBarcodeOnce(code, companyId)
+                if (localProduct != null) {
+                    selectedProduct = localProduct
+                    showProductDialog = true
+                } else {
+                    isSearchingGlobal = true
+                    val globalProduct = ProductLookupService.lookupByBarcode(code, companyId)
+                    isSearchingGlobal = false
+                    
+                    if (globalProduct != null) {
+                        selectedProduct = globalProduct
+                        showProductDialog = true
+                    } else {
+                        selectedProduct = Producto(
+                            nombre = "",
+                            codigo = code,
+                            codigoBarras = code,
+                            precioVenta = 0,
+                            costoUnitario = 0,
+                            stock = 0,
+                            empresaId = companyId
+                        )
+                        showProductDialog = true
+                    }
+                }
+            }
+        }
+        scannerLauncher.launch(intent)
     }
 
     @Composable
@@ -172,7 +227,6 @@ class InventoryFragment : Fragment() {
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Selector de Producto
                     Box {
                         OutlinedButton(onClick = { expandedProduct = true }, modifier = Modifier.fillMaxWidth()) {
                             Text("Producto: ${selectedProduct.nombre}")
@@ -184,7 +238,6 @@ class InventoryFragment : Fragment() {
                         }
                     }
 
-                    // Selector de Tipo
                     Box {
                         OutlinedButton(onClick = { expandedType = true }, modifier = Modifier.fillMaxWidth()) {
                             Text("Tipo: ${selectedType.second}")
@@ -234,14 +287,14 @@ class InventoryFragment : Fragment() {
         product: Producto?,
         onDismiss: () -> Unit,
         onSave: (String, String, String?, Long, Long, Int) -> Unit,
-        onScan: (((String, String) -> Unit)) -> Unit
+        onScan: () -> Unit
     ) {
-        var name by remember { mutableStateOf(product?.nombre ?: "") }
-        var code by remember { mutableStateOf(product?.codigo ?: "") }
-        var barcode by remember { mutableStateOf(product?.codigoBarras ?: "") }
-        var price by remember { mutableStateOf(if (product != null) (product.precioVenta / 100.0).toString() else "") }
-        var cost by remember { mutableStateOf(if (product != null) (product.costoUnitario / 100.0).toString() else "") }
-        var stock by remember { mutableStateOf(product?.stock?.toString() ?: "0") }
+        var name by remember(product) { mutableStateOf(product?.nombre ?: "") }
+        var code by remember(product) { mutableStateOf(product?.codigo ?: "") }
+        var barcode by remember(product) { mutableStateOf(product?.codigoBarras ?: "") }
+        var price by remember(product) { mutableStateOf(if (product != null && product.precioVenta > 0) (product.precioVenta / 100.0).toString() else "") }
+        var cost by remember(product) { mutableStateOf(if (product != null && product.costoUnitario > 0) (product.costoUnitario / 100.0).toString() else "") }
+        var stock by remember(product) { mutableStateOf(product?.stock?.toString() ?: "0") }
 
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -254,7 +307,7 @@ class InventoryFragment : Fragment() {
                 }) { Text("Guardar") }
             },
             dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
-            title = { Text(if (product == null) "Nuevo Producto" else "Editar Producto") },
+            title = { Text(if (product?.id == 0 || product == null) "Nuevo Producto" else "Editar Producto") },
             text = {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -270,9 +323,7 @@ class InventoryFragment : Fragment() {
                             label = "Código de Barras",
                             modifier = Modifier.weight(1f)
                         )
-                        IconButton(onClick = { 
-                            onScan { c, _ -> barcode = c }
-                        }) {
+                        IconButton(onClick = onScan) {
                             Icon(Icons.Default.QrCodeScanner, contentDescription = "Escanear")
                         }
                     }
@@ -300,10 +351,11 @@ class InventoryFragment : Fragment() {
                 stock = stock,
                 empresaId = companyId,
                 categoria = selectedProduct?.categoria ?: "General",
-                stockMinimo = selectedProduct?.stockMinimo ?: 5
+                stockMinimo = selectedProduct?.stockMinimo ?: 5,
+                fotoUrl = selectedProduct?.fotoUrl ?: ""
             )
             try {
-                if (selectedProduct == null) db.productoDao().insert(product)
+                if (product.id == 0) db.productoDao().insert(product)
                 else db.productoDao().update(product)
                 showProductDialog = false
                 Toast.makeText(context, "Producto guardado", Toast.LENGTH_SHORT).show()
@@ -325,9 +377,5 @@ class InventoryFragment : Fragment() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
-    }
-
-    private fun openScanner(title: String) {
-        scannerLauncher.launch(Intent(requireContext(), ScannerActivity::class.java).putExtra(ScannerActivity.EXTRA_TITLE, title))
     }
 }

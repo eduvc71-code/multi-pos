@@ -2,40 +2,36 @@ package com.multipos.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Colores corporativos MultiPOS basados en el diseño existente
-val MultiPOSPrimary = Color(0xFF1976D2)
-val MultiPOSPrimaryVariant = Color(0xFF1565C0)
-val MultiPOSSecondary = Color(0xFF42A5F5)
-val MultiPOSSecondaryVariant = Color(0xFF1E88E5)
+/**
+ * COLORES PREMIUM EXTRAÍDOS DE LA IMAGEN CORPORATIVA
+ * Basados en Verde Esmeralda / Teal vibrante y Grises Premium.
+ */
 
-// Colores de fondo y superficie
-val MultiPOSBackground = Color(0xFFF5F5F5)
-val MultiPOSSurface = Color(0xFFFFFFFF)
-val MultiPOSSurfaceVariant = Color(0xFFF0F4F8)
+// --- PALETA ESMERALDA VIBRANTE (PRIMARY) ---
+val EmeraldPrimary = Color(0xFF00BFA5)         // Verde esmeralda principal
+val EmeraldPrimaryDark = Color(0xFF00897B)     // Sombra para botones presionados
+val EmeraldPrimaryLight = Color(0xFFE0F2F1)    // Fondos suaves de botones o badges
+val EmeraldOnPrimary = Color(0xFFFFFFFF)       // Texto sobre esmeralda
 
-// Colores de texto
-val MultiPOSTextPrimary = Color(0xFF212121)
-val MultiPOSTextSecondary = Color(0xFF757575)
-val MultiPOSTextMuted = Color(0xFF9E9E9E)
-val MultiPOSTextOnPrimary = Color(0xFFFFFFFF)
-val MultiPOSTextOnSecondary = Color(0xFF000000)
+// --- PALETA GRIS PREMIUM (BACKGROUND & SURFACE) ---
+val PremiumGreyBackground = Color(0xFFF5F7FA)  // Fondo hueso/gris limpio (teléfono derecho)
+val PremiumWhiteSurface = Color(0xFFFFFFFF)    // Superficie de tarjetas blancas
+val PremiumGreyBorder = Color(0xFFE0E6ED)      // Bordes sutiles de inputs y cards
 
-// Colores de estado
-val MultiPOSSuccess = Color(0xFF4CAF50)
-val MultiPOSWarning = Color(0xFFFF9800)
-val MultiPOSError = Color(0xFFF44336)
-val MultiPOSInfo = Color(0xFF2196F3)
+// --- PALETA OSCURA (DARK MODE / FLOATING CARDS) ---
+val DeepDarkBackground = Color(0xFF111417)     // Negro premium profundo
+val DeepDarkSurface = Color(0xFF1E2125)        // Gris oscuro para tarjetas (card central)
+val DeepDarkBorder = Color(0xFF2D3238)         // Borde sutil para modo oscuro
 
-// Colores adicionales para UI
-val MultiPOSBorder = Color(0xFFE0E0E0)
-val MultiPOSDivider = Color(0xFFEEEEEE)
-val MultiPOSShadow = Color(0x1A000000)
+// --- COLORES DE ACENTO Y ESTADO ---
+val AccentOrange = Color(0xFFFFA000)           // Naranja de la tarjeta de porcentaje (30%)
+val AccentTealSecondary = Color(0xFF00ACC1)    // Variante teal para gráficos o filtros
+val SoftSuccess = Color(0xFF43A047)
+val SoftError = Color(0xFFE53935)
+val SoftWarning = Color(0xFFFFB300)
 
-// Dark mode colors
-val MultiPOSDarkBackground = Color(0xFF121212)
-val MultiPOSDarkSurface = Color(0xFF1E1E1E)
-val MultiPOSDarkSurfaceVariant = Color(0xFF2C2C2C)
-val MultiPOSDarkTextPrimary = Color(0xFFE0E0E0)
-val MultiPOSDarkTextSecondary = Color(0xFFB0B0B0)
-val MultiPOSDarkBorder = Color(0xFF424242)
-val MultiPOSDarkDivider = Color(0xFF333333)
+// --- COLORES DE TEXTO ---
+val TextPrimary = Color(0xFF1A1C1E)            // Texto casi negro para alta legibilidad
+val TextSecondary = Color(0xFF64748B)          // Gris azulado para subtítulos
+val TextMuted = Color(0xFF94A3B8)             // Gris claro para placeholders
+val TextOnDark = Color(0xFFF1F4F9)             // Texto claro para modo oscuro

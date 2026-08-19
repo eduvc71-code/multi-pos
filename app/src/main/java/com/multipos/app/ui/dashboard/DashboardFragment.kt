@@ -31,10 +31,15 @@ class DashboardFragment : Fragment() {
             setContent {
                 MultiPOSTheme {
                     val state by viewModel.uiState.collectAsState()
+                    val companyName = com.multipos.app.data.ActiveCompanyStore.getName(requireContext())
                     DashboardScreen(
+                        companyName = companyName,
                         totalSalesToday = state.totalSalesToday,
                         totalProducts = state.totalProducts,
-                        lowStockCount = state.lowStockCount
+                        lowStockCount = state.lowStockCount,
+                        onLogoutClick = {
+                            (activity as? com.multipos.app.ui.home.HomeActivity)?.logout()
+                        }
                     )
                 }
             }

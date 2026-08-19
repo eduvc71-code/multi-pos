@@ -1,9 +1,11 @@
 package com.multipos.app.ui.inventory.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,13 +14,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
-import com.multipos.app.ui.components.MultiPOSSearchField
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 
@@ -44,28 +49,13 @@ fun InventoryScreen(
                     Text(
                         text = "Inventario",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Black
                     )
                 },
                 actions = {
-                    IconButton(onClick = onScanClick) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "Escanear código"
-                        )
-                    }
-                    IconButton(onClick = onMovementsClick) {
-                        Icon(
-                            imageVector = Icons.Default.History,
-                            contentDescription = "Movimientos"
-                        )
-                    }
-                    IconButton(onClick = onAddProductClick) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Agregar producto"
-                        )
-                    }
+                    IconButton(onClick = onScanClick) { Icon(Icons.Default.QrCodeScanner, null) }
+                    IconButton(onClick = onMovementsClick) { Icon(Icons.Default.History, null) }
+                    IconButton(onClick = onAddProductClick) { Icon(Icons.Default.Add, null) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -78,91 +68,62 @@ fun InventoryScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Buscador y filtros
-            MultiPOSSearchField(
+            OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = "Buscar producto por nombre o código..."
+                placeholder = { Text("Buscar producto...") },
+                leadingIcon = { Icon(Icons.Default.Search, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(4.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                ),
+                singleLine = true
             )
             
-            // Resumen de inventario
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+            // TABLA INDUSTRIAL
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .border(1.dp, Color.Black)
+                    .background(Color.White)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    StatItem(
-                        label = "Total Productos",
-                        value = products.size.toString(),
-                        icon = Icons.Default.Inventory
-                    )
-                    StatItem(
-                        label = "Valor Inventario",
-                        value = Money.format(products.sumOf { it.precioVenta * it.stock }),
-                        icon = Icons.Default.AttachMoney
-                    )
-                    StatItem(
-                        label = "Stock Bajo",
-                        value = products.count { it.stock <= 5 }.toString(),
-                        icon = Icons.Default.Warning
-                    )
-                }
-            }
-            
-            // Grid de productos
-            if (products.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Column {
+                    // Header Tabla con Iconos y texto separado (Prompt User)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFE0E0E0))
+                            .border(androidx.compose.foundation.BorderStroke(0.5.dp, Color.Black)),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Inventory,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No hay productos en el inventario",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        MultiPOSButton(
-                            text = "Agregar primer producto",
-                            onClick = onAddProductClick,
-                            modifier = Modifier.width(200.dp)
-                        )
+                        TableCellHeader("PRODUCTO", Icons.Default.Inventory2, Modifier.weight(0.45f))
+                        TableCellHeader("COSTO\n(UNIT)", Icons.Default.AttachMoney, Modifier.weight(0.18f))
+                        TableCellHeader("PRECIO\n(VENTA)", Icons.Default.Sell, Modifier.weight(0.18f))
+                        TableCellHeader("STOCK\n(ACT)", Icons.Default.Inventory, Modifier.weight(0.19f))
                     }
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 160.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(products, key = { it.id }) { product ->
-                        ProductInventoryCard(
-                            product = product,
-                            onEditClick = { onEditProductClick(product) },
-                            onDeleteClick = { onDeleteProductClick(product) }
-                        )
+
+                    if (products.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No hay resultados", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                        }
+                    } else {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(products, key = { it.id }) { product ->
+                                ProductRowExcel(
+                                    product = product,
+                                    onEdit = { onEditProductClick(product) },
+                                    onDelete = { onDeleteProductClick(product) }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -171,115 +132,65 @@ fun InventoryScreen(
 }
 
 @Composable
-fun StatItem(
-    label: String,
-    value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier
-) {
+fun TableCellHeader(text: String, icon: ImageVector, modifier: Modifier) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .border(0.5.dp, Color.Black)
+            .padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        Icon(icon, null, modifier = Modifier.size(14.dp), tint = Color.DarkGray)
         Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = text,
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+            fontWeight = FontWeight.Black,
+            textAlign = TextAlign.Center,
+            lineHeight = 10.sp
         )
     }
 }
 
 @Composable
-fun ProductInventoryCard(
-    product: Producto,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (product.stock <= 5) 
-                MaterialTheme.colorScheme.errorContainer 
-            else 
-                MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = product.nombre,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                if (product.codigo.isNotBlank()) {
-                    Text(
-                        text = "Cód: ${product.codigo}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            
+fun TableCell(text: String, modifier: Modifier, alignEnd: Boolean = false, color: Color = Color.Black) {
+    Text(
+        text = text,
+        modifier = modifier
+            .border(0.5.dp, Color.Black)
+            .padding(8.dp),
+        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+        fontWeight = FontWeight.Bold,
+        textAlign = if (alignEnd) TextAlign.End else TextAlign.Start,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        color = color
+    )
+}
+
+@Composable
+fun ProductRowExcel(product: Producto, onEdit: () -> Unit, onDelete: () -> Unit) {
+    var showActions by remember { mutableStateOf(false) }
+    
+    Column(modifier = Modifier.clickable { showActions = !showActions }) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TableCell(product.nombre.uppercase(), Modifier.weight(0.45f))
+            // Solo números (formatPlain)
+            TableCell(Money.formatPlain(product.costoUnitario), Modifier.weight(0.18f), alignEnd = true)
+            TableCell(Money.formatPlain(product.precioVenta), Modifier.weight(0.18f), alignEnd = true, color = MaterialTheme.colorScheme.primary)
+            TableCell(product.stock.toString(), Modifier.weight(0.19f), alignEnd = true)
+        }
+        
+        if (showActions) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f))
+                    .border(0.5.dp, Color.Black)
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.End
             ) {
-                Column {
-                    Text(
-                        text = Money.format(product.precioVenta),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "Stock: ${product.stock}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (product.stock <= 5) 
-                            MaterialTheme.colorScheme.onErrorContainer 
-                        else 
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                Row {
-                    IconButton(onClick = onEditClick) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar producto",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Eliminar producto",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
+                IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) }
+                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, null, tint = Color.Red, modifier = Modifier.size(20.dp)) }
             }
         }
     }
@@ -289,21 +200,9 @@ fun ProductInventoryCard(
 @Composable
 fun InventoryScreenPreview() {
     val dummyProducts = listOf(
-        Producto(1, "Coca Cola 2L", "PROD001", 1500, 1000, 24, 5, "Bebidas", "", "7501055300075", "EAN_13", "EMP01"),
-        Producto(2, "Pan de Molde", "PROD002", 2200, 1500, 12, 3, "Panadería", "", "7501055300082", "EAN_13", "EMP01"),
-        Producto(3, "Leche Entera", "PROD003", 1100, 800, 4, 10, "Lácteos", "", "7501055300099", "EAN_13", "EMP01")
+        Producto(1, "Arroz 1kg", "PROD001", 1200, 800, 50, 5, "Abarrotes", "", "123", "EAN", "EMP")
     )
     MultiPOSTheme {
-        InventoryScreen(
-            products = dummyProducts,
-            searchQuery = "",
-            isLoading = false,
-            onSearchChange = {},
-            onAddProductClick = {},
-            onEditProductClick = {},
-            onDeleteProductClick = {},
-            onMovementsClick = {},
-            onScanClick = {}
-        )
+        InventoryScreen(dummyProducts, "", false, {}, {}, {}, {}, {}, {})
     }
 }

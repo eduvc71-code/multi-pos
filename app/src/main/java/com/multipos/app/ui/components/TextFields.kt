@@ -9,12 +9,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.multipos.app.ui.theme.premiumBorder
 
 /**
- * TextField estándar MultiPOS
+ * TextField MultiPOS - Estilo Rounded Pill Premium
  */
 @Composable
 fun MultiPOSTextField(
@@ -35,18 +38,19 @@ fun MultiPOSTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = placeholder?.let { { Text(it) } },
+        // Usamos placeholder para el look "Pill" limpio, o label si se prefiere
+        placeholder = { Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(28.dp), // Radio fijo optimizado para texto largo
         colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedBorderColor = MaterialTheme.colorScheme.premiumBorder,
             focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            errorBorderColor = MaterialTheme.colorScheme.error
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         isError = isError,
         singleLine = singleLine,
@@ -58,7 +62,7 @@ fun MultiPOSTextField(
 }
 
 /**
- * TextField para búsqueda con icono
+ * TextField para búsqueda con icono estilo Píldora
  */
 @Composable
 fun MultiPOSSearchField(
@@ -71,12 +75,12 @@ fun MultiPOSSearchField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(placeholder) },
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.primary
             )
         },
         trailingIcon = {
@@ -91,12 +95,12 @@ fun MultiPOSSearchField(
             }
         },
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(50), // Rounded Pill
         colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            unfocusedBorderColor = MaterialTheme.colorScheme.premiumBorder
         ),
         singleLine = true,
         enabled = enabled
@@ -119,16 +123,16 @@ fun MultiPOSNumberField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        leadingIcon = prefix?.let { { Text(it, style = MaterialTheme.typography.bodyLarge) } },
+        label = { Text(label, fontWeight = FontWeight.Medium) },
+        leadingIcon = prefix?.let { { Text(it, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold) } },
         trailingIcon = suffix?.let { { Text(it, style = MaterialTheme.typography.bodyLarge) } },
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(50),
         colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            unfocusedBorderColor = MaterialTheme.colorScheme.premiumBorder
         ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,

@@ -136,7 +136,7 @@ class SaleRepository(private val database: AppDatabase) {
             )
         )
 
-        if (request.paymentType == PAYMENT_EFFECTIVE) {
+        if (request.paymentType != PAYMENT_CREDIT) {
             database.movimientoCajaDao().insert(
                 MovimientoCaja(
                     cajaSesionId = cashSession.id,
@@ -145,7 +145,7 @@ class SaleRepository(private val database: AppDatabase) {
                     tipo = MovimientoCaja.TIPO_INGRESO_VENTA,
                     monto = request.total,
                     ventaId = saleId,
-                    concepto = "Venta #${saleId}",
+                    concepto = "Venta #${saleId} (${request.paymentType})",
                     fecha = now
                 )
             )

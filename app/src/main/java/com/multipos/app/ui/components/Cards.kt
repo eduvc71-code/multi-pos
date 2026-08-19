@@ -1,5 +1,6 @@
 package com.multipos.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,9 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.multipos.app.ui.theme.MultiPOSTypography
+import com.multipos.app.ui.theme.premiumBorder
 
 /**
- * Card personalizada MultiPOS con diseño moderno
+ * Card personalizada MultiPOS - Estilo Fintech Executive (Plano 3D)
  */
 @Composable
 fun MultiPOSCard(
@@ -26,10 +28,11 @@ fun MultiPOSCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp), // Radio premium de 24px
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.premiumBorder), // Borde sutil #E0E6ED
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         content = content
     )
@@ -50,21 +53,21 @@ fun ProductCard(
     Card(
         modifier = modifier
             .width(160.dp)
-            .height(200.dp),
-        shape = RoundedCornerShape(12.dp),
+            .height(210.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.premiumBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Contenido personalizado (imagen del producto)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -76,30 +79,27 @@ fun ProductCard(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Nombre del producto
             Text(
                 text = productName,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2
             )
             
             Spacer(modifier = Modifier.height(4.dp))
             
-            // Precio
             Text(
                 text = productPrice,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Black,
                 color = MaterialTheme.colorScheme.primary
             )
             
-            // Stock (opcional)
             if (productStock != null) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
                     Text(
@@ -129,25 +129,25 @@ fun CartItemCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface
         ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.premiumBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Información del producto
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = productName,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
@@ -157,51 +157,59 @@ fun CartItemCard(
                 )
             }
             
-            // Controles de cantidad
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 IconButton(
                     onClick = onDecreaseQuantity,
                     enabled = quantity > 1
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = "Disminuir cantidad",
-                        tint = if (quantity > 1) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        color = Color.Transparent
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = "Disminuir",
+                            modifier = Modifier.padding(4.dp),
+                            tint = if (quantity > 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                        )
+                    }
                 }
                 
                 Text(
                     text = quantity.toString(),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.width(32.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 
                 IconButton(onClick = onIncreaseQuantity) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Aumentar cantidad",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Aumentar",
+                            modifier = Modifier.padding(4.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
             }
             
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
             
-            // Subtotal
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = subtotal,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.primary
                 )
             }

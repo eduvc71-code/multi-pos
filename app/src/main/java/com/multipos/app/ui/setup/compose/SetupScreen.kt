@@ -1,7 +1,9 @@
 package com.multipos.app.ui.setup.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,10 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSTextField
 import com.multipos.app.ui.theme.MultiPOSTheme
-import com.multipos.app.ui.theme.onBackgroundVariant
 
 @Composable
 fun SetupScreen(
@@ -44,138 +46,122 @@ fun SetupScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .imePadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 32.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Header
+        // Header Executive
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(44.dp)
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Store, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.Store, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
                     }
                 }
-                Spacer(modifier = Modifier.width(14.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Configura MultiPOS",
-                    style = MaterialTheme.typography.headlineLarge,
+                    text = "Configuración",
+                    style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Registra tu negocio y crea la cuenta segura del propietario.",
+                text = "Crea tu espacio de trabajo premium",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackgroundVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        // Formulario
+        // Card Única Premium
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
-            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 
-                // Sección 1: Datos del negocio
-                SectionHeader(number = "1", title = "Datos del negocio")
+                Text(text = "DATOS DEL NEGOCIO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 
                 MultiPOSTextField(
                     value = businessName,
                     onValueChange = onBusinessNameChange,
-                    label = "Nombre del negocio",
-                    leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) }
+                    label = "Nombre Comercial",
+                    leadingIcon = { Icon(Icons.Default.Storefront, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = businessNit,
                     onValueChange = onBusinessNitChange,
-                    label = "NIT (opcional)",
-                    leadingIcon = { Icon(Icons.Default.Badge, contentDescription = null) }
+                    label = "NIT / ID Fiscal",
+                    leadingIcon = { Icon(Icons.Default.Badge, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 
-                // Sección 2: Propietario
-                SectionHeader(number = "2", title = "Propietario y acceso")
+                Text(text = "ACCESO PROPIETARIO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 
                 MultiPOSTextField(
                     value = ownerName,
                     onValueChange = onOwnerNameChange,
-                    label = "Nombre del propietario",
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) }
+                    label = "Nombre Completo",
+                    leadingIcon = { Icon(Icons.Default.Person, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = username,
                     onValueChange = onUsernameChange,
-                    label = "Usuario",
-                    leadingIcon = { Icon(Icons.Default.AccountCircle, contentDescription = null) }
+                    label = "Usuario de acceso",
+                    leadingIcon = { Icon(Icons.Default.AccountCircle, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = pass,
                     onValueChange = onPassChange,
-                    label = "Crear contraseña",
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    label = "Contraseña Segura",
+                    leadingIcon = { Icon(Icons.Default.Lock, null, tint = MaterialTheme.colorScheme.primary) },
                     visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passVisible = !passVisible }) {
-                            Icon(if (passVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null)
+                            Icon(if (passVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null)
                         }
                     }
                 )
-                
+
                 MultiPOSTextField(
                     value = confirmPass,
                     onValueChange = onConfirmPassChange,
-                    label = "Confirmar contraseña",
-                    leadingIcon = { Icon(Icons.Default.LockReset, contentDescription = null) },
+                    label = "Confirmar Contraseña",
+                    leadingIcon = { Icon(Icons.Default.LockReset, null, tint = MaterialTheme.colorScheme.primary) },
                     visualTransformation = if (confirmPassVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { confirmPassVisible = !confirmPassVisible }) {
-                            Icon(if (confirmPassVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null)
+                            Icon(if (confirmPassVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null)
                         }
                     }
                 )
                 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 
                 MultiPOSButton(
-                    text = "CREAR ESPACIO DE TRABAJO",
+                    text = "Finalizar Configuración",
                     onClick = onCreateClick,
-                    enabled = !isLoading,
                     showLoading = isLoading
                 )
             }
         }
         
         Spacer(modifier = Modifier.height(32.dp))
-    }
-}
-
-@Composable
-fun SectionHeader(number: String, title: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Surface(
-            shape = RoundedCornerShape(4.dp),
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            modifier = Modifier.size(24.dp)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(text = number, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-            }
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     }
 }

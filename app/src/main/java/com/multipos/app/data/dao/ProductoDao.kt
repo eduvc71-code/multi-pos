@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductoDao {
+    @Query("SELECT * FROM productos WHERE (codigo = :code OR codigoBarras = :code) AND empresaId = :empresaId AND activo = 1 LIMIT 1")
+    suspend fun getByBarcodeOnce(code: String, empresaId: String): Producto?
+
     @Query("SELECT * FROM productos WHERE empresaId = :empresaId AND activo = 1 ORDER BY nombre ASC")
     fun getAll(empresaId: String): Flow<List<Producto>>
 
@@ -41,4 +44,7 @@ interface ProductoDao {
 
     @Query("SELECT * FROM productos WHERE empresaId = :empresaId AND activo = 1 AND (codigo = :code OR codigoBarras = :code) AND stock >= 0 LIMIT 1")
     suspend fun getByCode(empresaId: String, code: String): Producto?
+
+    @Query("DELETE FROM productos WHERE empresaId = :empresaId")
+    suspend fun deleteAll(empresaId: String)
 }

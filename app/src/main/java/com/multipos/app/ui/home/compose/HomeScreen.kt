@@ -36,69 +36,54 @@ fun HomeScreen(
                 shadowElevation = 4.dp,
                 color = MaterialTheme.colorScheme.surface
             ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    // Header Card
-                    MultiPOSCard(elevation = 2.dp) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "ESPACIO DE TRABAJO",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    letterSpacing = 1.sp
-                                )
-                                TextButton(onClick = onLogoutClick) {
-                                    Text("Cerrar Sesión", color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
-                                }
-                            }
-                            
-                            Button(
-                                onClick = onCompanyClick,
-                                modifier = Modifier.fillMaxWidth().height(48.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                                contentPadding = PaddingValues(horizontal = 14.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(Icons.Default.Business, contentDescription = null, tint = companyColor)
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(text = "Empresa: $activeCompanyName", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
-                                }
-                            }
-                            
-                            Spacer(modifier = Modifier.height(10.dp))
-                            
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(text = "$userName · $userRole", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
+                Column(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(horizontal = 14.dp, vertical = 4.dp) // Reducido vertical
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "POS",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.primary,
+                                letterSpacing = 1.sp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = userName,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        TextButton(
+                            onClick = onLogoutClick,
+                            contentPadding = PaddingValues(0.dp),
+                            modifier = Modifier.height(28.dp)
+                        ) {
+                            Text("SALIR", color = MaterialTheme.colorScheme.error, fontSize = 10.sp, fontWeight = FontWeight.Black)
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     
-                    // Menu Horizontal
+                    // Menu Horizontal Ultra Compacto
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         MenuItem(Icons.Default.Analytics, "Inicio", selectedMenu == "DASHBOARD", companyColor) { onMenuItemClick("DASHBOARD") }
                         MenuItem(Icons.Default.ShoppingCart, "Ventas", selectedMenu == "POS", companyColor) { onMenuItemClick("POS") }
                         MenuItem(Icons.Default.Inventory, "Inventario", selectedMenu == "INVENTORY", companyColor) { onMenuItemClick("INVENTORY") }
                         MenuItem(Icons.Default.History, "Historial", selectedMenu == "HISTORY", companyColor) { onMenuItemClick("HISTORY") }
                         MenuItem(Icons.Default.People, "Clientes", selectedMenu == "CLIENTS", companyColor) { onMenuItemClick("CLIENTS") }
-                        MenuItem(Icons.Default.Badge, "Equipo", selectedMenu == "EMPLOYEES", companyColor) { onMenuItemClick("EMPLOYEES") }
                         MenuItem(Icons.Default.Payments, "Caja", selectedMenu == "CASH", companyColor) { onMenuItemClick("CASH") }
                         MenuItem(Icons.Default.BarChart, "Reportes", selectedMenu == "REPORTS", companyColor) { onMenuItemClick("REPORTS") }
                     }
@@ -122,12 +107,12 @@ fun MenuItem(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.height(46.dp),
-        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.height(34.dp), // Reducido a 34dp
+        shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSelected) accentColor else MaterialTheme.colorScheme.surfaceVariant
         ),
-        contentPadding = PaddingValues(horizontal = 14.dp)
+        contentPadding = PaddingValues(horizontal = 10.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(

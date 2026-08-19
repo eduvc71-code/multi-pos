@@ -1,33 +1,38 @@
 package com.multipos.app.ui.pos.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.data.models.CartLine
-import com.multipos.app.ui.components.CartItemCard
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
-import com.multipos.app.ui.components.MultiPOSSearchField
 import com.multipos.app.ui.theme.MultiPOSTheme
-import com.multipos.app.ui.theme.success
-import com.multipos.app.ui.theme.warning
-
-data class CartItem(
-    val product: com.multipos.app.data.entities.Producto,
-    val quantity: Int
-)
+import com.multipos.app.util.Money
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,8 +44,9 @@ fun POSScreen(
     total: Long,
     searchQuery: String,
     isLoading: Boolean,
+    warning: String? = null,
     onSearchChange: (String) -> Unit,
-    onAddToCart: (Producto) -> Unit,
+    onAddToCart: (Producto, Int) -> Unit,
     onIncreaseQuantity: (Int) -> Unit,
     onDecreaseQuantity: (Int) -> Unit,
     onRemoveFromCart: (Int) -> Unit,
@@ -50,27 +56,38 @@ fun POSScreen(
     onChargeClick: () -> Unit,
     onScanProduct: () -> Unit,
     onScanClientQr: () -> Unit,
+    onClearWarning: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showPaymentOptions by remember { mutableStateOf(false) }
-    
+    var showSearchResults by remember { mutableStateOf(false) }
+    var showPaymentDialog by remember { mutableStateOf(false) }
+    var lineToEdit by remember { mutableStateOf<Int?>(null) }
+    var productToQtyDialog by remember { mutableStateOf<Producto?>(null) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(warning) {
+        if (warning != null) {
+            snackbarHostState.showSnackbar(warning)
+            onClearWarning()
+        }
+    }
+
     Scaffold(
-        modifier = modifier.imePadding(), // Evita que el teclado tape el resumen del carrito
+        modifier = modifier.imePadding(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Punto de Venta",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Black
                     )
                 },
                 actions = {
                     IconButton(onClick = onScanProduct) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "Escanear producto"
-                        )
+                        Icon(imageVector = Icons.Default.QrCodeScanner, contentDescription = null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -81,252 +98,151 @@ fun POSScreen(
             )
         }
     ) { paddingValues ->
-        Row(
-            modifier = modifier
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Panel izquierdo - Catálogo de productos
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Buscador
-                MultiPOSSearchField(
+            // Buscador Rectangular
+            Box {
+                OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = onSearchChange,
-                    placeholder = "Buscar producto por nombre o código..."
+                    onValueChange = { 
+                        onSearchChange(it)
+                        showSearchResults = it.isNotEmpty()
+                    },
+                    placeholder = { Text("Buscar producto (ej: PA)...") },
+                    leadingIcon = { Icon(Icons.Default.Search, null, tint = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(4.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    singleLine = true
                 )
-                
-                // Lista de productos
-                Card(
-                    modifier = Modifier.fillMaxHeight(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+
+                if (showSearchResults && products.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 60.dp)
+                            .heightIn(max = 250.dp),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Black)
                     ) {
-                        items(products) { product ->
-                            ProductListItem(
-                                product = product,
-                                onClick = { onAddToCart(product) }
-                            )
+                        LazyColumn {
+                            items(products) { product ->
+                                ProductSearchRow(product) {
+                                    productToQtyDialog = product
+                                    showSearchResults = false
+                                    onSearchChange("")
+                                }
+                                HorizontalDivider(color = Color.Black.copy(alpha = 0.1f))
+                            }
                         }
                     }
                 }
             }
-            
-            // Panel derecho - Carrito
-            Column(
+
+            // --- TABLA TIPO EXCEL / GRID INDUSTRIAL ---
+            Box(
                 modifier = Modifier
-                    .weight(0.8f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .border(1.dp, Color.Black)
+                    .background(Color.White)
             ) {
-                // Header del carrito
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Carrito",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (cartLines.isNotEmpty()) {
-                        TextButton(onClick = onClearCart) {
-                            Text("Limpiar")
-                        }
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFE0E0E0))
+                            .border(androidx.compose.foundation.BorderStroke(0.5.dp, Color.Black)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TableCell("CANT.", Modifier.weight(0.12f), isHeader = true)
+                        TableCell("PRODUCTO", Modifier.weight(0.58f), isHeader = true)
+                        TableCell("P/U", Modifier.weight(0.15f), isHeader = true, alignEnd = true)
+                        TableCell("Bs.", Modifier.weight(0.15f), isHeader = true, alignEnd = true)
                     }
-                }
-                
-                // Lista del carrito
-                Card(
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
+
                     if (cartLines.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ShoppingCart,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(64.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    text = "El carrito está vacío",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.ShoppingCart, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text("LISTA VACÍA", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = Color.LightGray)
                             }
                         }
                     } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(cartLines, key = { it.productId }) { line ->
-                                CartItemCard(
-                                    productName = line.productName,
-                                    quantity = line.quantity,
-                                    price = Money.format(line.price),
-                                    subtotal = Money.format(line.price * line.quantity),
-                                    onIncreaseQuantity = { onIncreaseQuantity(line.productId) },
-                                    onDecreaseQuantity = { onDecreaseQuantity(line.productId) }
+                                CartRowExcel(
+                                    line = line,
+                                    isEditing = lineToEdit == line.productId,
+                                    onRowClick = { lineToEdit = if (lineToEdit == line.productId) null else line.productId },
+                                    onIncrease = { onIncreaseQuantity(line.productId) },
+                                    onDecrease = { onDecreaseQuantity(line.productId) },
+                                    onRemove = { onRemoveFromCart(line.productId) }
                                 )
                             }
                         }
-                    }
-                }
-                
-                // Resumen y controles de pago
-                MultiPOSCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Selector de cliente
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Cliente:",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = selectedClient ?: "No aplica",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                IconButton(
-                                    onClick = onScanClientQr,
-                                    enabled = paymentMethod == "CREDITO"
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.QrCode,
-                                        contentDescription = "Escanear QR cliente",
-                                        tint = if (paymentMethod == "CREDITO") 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                        
-                        // Selector de método de pago
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Método de pago:",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            FilterChip(
-                                selected = true,
-                                onClick = { showPaymentOptions = true },
-                                label = { Text(paymentMethod) },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = when (paymentMethod) {
-                                            "EFECTIVO" -> Icons.Default.Money
-                                            "TARJETA" -> Icons.Default.CreditCard
-                                            "TRANSFERENCIA" -> Icons.Default.AccountBalance
-                                            "CREDITO" -> Icons.Default.Description
-                                            else -> Icons.Default.Payment
-                                        },
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                            )
-                        }
-                        
-                        Divider()
-                        
-                        // Total
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Total:",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = Money.format(total),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        
-                        // Botón de cobrar
-                        MultiPOSButton(
-                            text = "Cobrar",
-                            onClick = onChargeClick,
-                            enabled = cartLines.isNotEmpty() && !isLoading,
-                            showLoading = isLoading
-                        )
                     }
                 }
             }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column {
+                    Text(text = "CLIENTE: ${selectedClient ?: "GENERAL"}", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                    Text(text = "ITEMS: ${cartLines.sumOf { it.quantity }}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(text = "TOTAL BS.", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                    Text(
+                        text = Money.formatPlain(total),
+                        style = MaterialTheme.typography.displayMedium,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            MultiPOSButton(
+                text = "Finalizar Cobro",
+                onClick = { if (cartLines.isNotEmpty()) showPaymentDialog = true },
+                enabled = cartLines.isNotEmpty() && !isLoading
+            )
         }
-        
-        // Diálogo de selección de método de pago
-        if (showPaymentOptions) {
-            AlertDialog(
-                onDismissRequest = { showPaymentOptions = false },
-                title = { Text("Selecciona método de pago") },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf("EFECTIVO", "TARJETA", "TRANSFERENCIA", "CREDITO").forEach { method ->
-                            FilterChip(
-                                selected = paymentMethod == method,
-                                onClick = {
-                                    onPaymentMethodSelected(method)
-                                    showPaymentOptions = false
-                                },
-                                label = { Text(method) }
-                            )
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showPaymentOptions = false }) {
-                        Text("Cancelar")
-                    }
+
+        if (showPaymentDialog) {
+            PaymentMethodDialog(
+                total = total,
+                onDismiss = { showPaymentDialog = false },
+                onConfirm = { method ->
+                    onPaymentMethodSelected(method)
+                    onChargeClick()
+                    showPaymentDialog = false
+                }
+            )
+        }
+
+        // Pantalla de Cantidad
+        productToQtyDialog?.let { product ->
+            QuantitySelectionDialog(
+                product = product,
+                onDismiss = { productToQtyDialog = null },
+                onConfirm = { qty ->
+                    onAddToCart(product, qty)
+                    productToQtyDialog = null
                 }
             )
         }
@@ -334,70 +250,64 @@ fun POSScreen(
 }
 
 @Composable
-fun ProductListItem(
+fun QuantitySelectionDialog(
     product: Producto,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    var qty by remember { mutableStateOf(1) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            border = androidx.compose.foundation.BorderStroke(2.dp, Color.Black)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = product.nombre,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2
-                )
-                if (product.codigo.isNotBlank()) {
-                    Text(
-                        text = "Cód: ${product.codigo}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Text("SELECCIONAR CANTIDAD", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                Text(product.nombre.uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    IconButton(onClick = { if (qty > 1) qty-- }, modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)) {
+                        Icon(Icons.Default.Remove, null, tint = MaterialTheme.colorScheme.primary)
+                    }
+                    Text(text = qty.toString(), style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Black)
+                    IconButton(onClick = { qty++ }, modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)) {
+                        Icon(Icons.Default.Add, null, tint = MaterialTheme.colorScheme.primary)
+                    }
                 }
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = Money.format(product.precioVenta),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                if (product.stock >= 0) {
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = if (product.stock > 10) 
-                            MaterialTheme.colorScheme.success.copy(alpha = 0.1f)
-                        else if (product.stock > 0)
-                            MaterialTheme.colorScheme.warning.copy(alpha = 0.1f)
-                        else
-                            MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                    ) {
-                        Text(
-                            text = "Stock: ${product.stock}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = if (product.stock > 10)
-                                MaterialTheme.colorScheme.success
-                            else if (product.stock > 0)
-                                MaterialTheme.colorScheme.warning
-                            else
-                                MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+
+                if (qty > product.stock) {
+                    Text("Advertencia: Supera stock (${product.stock})", color = Color.Red, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
+                    ) {
+                        Text("CANCELAR", fontWeight = FontWeight.Black)
+                    }
+                    Button(
+                        onClick = { onConfirm(qty) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text("AGREGAR", fontWeight = FontWeight.Black)
                     }
                 }
             }
@@ -405,48 +315,100 @@ fun ProductListItem(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun POSScreenPreview() {
-    val dummyProducts = listOf(
-        Producto(1, "Coca Cola 2L", "PROD001", 1500, 1000, 24, 5, "Bebidas", "", "7501055300075", "EAN_13", "EMP01"),
-        Producto(2, "Pan de Molde", "PROD002", 2200, 1500, 12, 3, "Panadería", "", "7501055300082", "EAN_13", "EMP01"),
-        Producto(3, "Leche Entera", "PROD003", 1100, 800, 4, 10, "Lácteos", "", "7501055300099", "EAN_13", "EMP01")
+fun TableCell(text: String, modifier: Modifier, isHeader: Boolean = false, alignEnd: Boolean = false) {
+    Text(
+        text = text,
+        modifier = modifier.border(0.5.dp, Color.Black).padding(6.dp),
+        style = if (isHeader) MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp) else MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
+        fontWeight = if (isHeader) FontWeight.Black else FontWeight.Bold,
+        textAlign = if (alignEnd) TextAlign.End else TextAlign.Start,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
-    val dummyCart = listOf(
-        CartLine(dummyProducts[0], 2),
-        CartLine(dummyProducts[1], 1)
-    )
-    
-    MultiPOSTheme {
-        POSScreen(
-            products = dummyProducts,
-            cartLines = dummyCart,
-            selectedClient = "Juan Cliente",
-            paymentMethod = "EFECTIVO",
-            total = 5200,
-            searchQuery = "",
-            isLoading = false,
-            onSearchChange = {},
-            onAddToCart = {},
-            onIncreaseQuantity = {},
-            onDecreaseQuantity = {},
-            onRemoveFromCart = {},
-            onClearCart = {},
-            onPaymentMethodSelected = {},
-            onClientSelected = {},
-            onChargeClick = {},
-            onScanProduct = {},
-            onScanClientQr = {}
-        )
+}
+
+@Composable
+fun CartRowExcel(line: CartLine, isEditing: Boolean, onRowClick: () -> Unit, onIncrease: () -> Unit, onDecrease: () -> Unit, onRemove: () -> Unit) {
+    Column {
+        Row(modifier = Modifier.fillMaxWidth().clickable { onRowClick() }) {
+            TableCell(line.quantity.toString(), Modifier.weight(0.12f))
+            TableCell(line.productName.uppercase(), Modifier.weight(0.58f))
+            TableCell(Money.formatPlain(line.price), Modifier.weight(0.15f), alignEnd = true)
+            TableCell(Money.formatPlain(line.price * line.quantity), Modifier.weight(0.15f), alignEnd = true)
+        }
+        if (isEditing) {
+            Row(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)).border(0.5.dp, Color.Black).padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onDecrease) { Icon(Icons.Default.RemoveCircle, null, tint = MaterialTheme.colorScheme.primary) }
+                Text(text = "CANT: ${line.quantity}", fontWeight = FontWeight.Black)
+                IconButton(onClick = onIncrease) { Icon(Icons.Default.AddCircle, null, tint = MaterialTheme.colorScheme.primary) }
+                IconButton(onClick = onRemove) { Icon(Icons.Default.Delete, null, tint = Color.Red) }
+            }
+        }
     }
 }
 
-// Helper para formateo de dinero
-object Money {
-    fun format(cents: Long): String {
-        val dollars = cents / 100
-        val centsPart = cents % 100
-        return "$${dollars}.${centsPart.toString().padStart(2, '0')}"
+@Composable
+fun ProductSearchRow(product: Producto, onClick: () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = product.nombre.uppercase(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text = Money.formatPlain(product.precioVenta), style = MaterialTheme.typography.bodyMedium, color = Color.Blue, fontWeight = FontWeight.Black)
+    }
+}
+
+@Composable
+fun PaymentMethodDialog(total: Long, onDismiss: () -> Unit, onConfirm: (method: String) -> Unit) {
+    var amountPaidText by remember { mutableStateOf("") }
+    var selectedMethod by remember { mutableStateOf("EFECTIVO") }
+    val amountPaid = amountPaidText.toDoubleOrNull() ?: 0.0
+    val changeMinor = ((amountPaid * 100).toLong() - total).coerceAtLeast(0L)
+    Dialog(onDismissRequest = onDismiss) {
+        Card(modifier = Modifier.fillMaxWidth().heightIn(min = 450.dp), shape = RoundedCornerShape(4.dp), border = androidx.compose.foundation.BorderStroke(2.dp, Color.Black)) {
+            Column {
+                Box(modifier = Modifier.fillMaxWidth().background(Color.Blue).padding(12.dp)) { Text("COBRAR - CAJA", color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp) }
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.width(90.dp).background(Color(0xFFDDDDDD)).fillMaxHeight()) {
+                        PaymentSidebarItem("EFECTIVO", Icons.Default.Payments, selectedMethod == "EFECTIVO") { selectedMethod = "EFECTIVO" }
+                        PaymentSidebarItem("QR", Icons.Default.QrCode, selectedMethod == "QR") { selectedMethod = "QR" }
+                        PaymentSidebarItem("TARJETA", Icons.Default.CreditCard, selectedMethod == "TARJETA") { selectedMethod = "TARJETA" }
+                        PaymentSidebarItem("CRÉDITO", Icons.Default.Description, selectedMethod == "CREDITO") { selectedMethod = "CREDITO" }
+                    }
+                    Column(modifier = Modifier.weight(1f).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("TOTAL A PAGAR:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                        Text(Money.formatPlain(total), style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Black, color = Color.Blue)
+                        if (selectedMethod == "EFECTIVO") {
+                            Text("PAGO CON:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                            OutlinedTextField(value = amountPaidText, onValueChange = { if (it.all { c -> c.isDigit() || c == '.' }) amountPaidText = it }, modifier = Modifier.fillMaxWidth(), textStyle = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black), placeholder = { Text("0.00") }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                            Text("CAMBIO:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                            Text(Money.formatPlain(changeMinor), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, color = Color.Red)
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = { onConfirm(selectedMethod) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(4.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5))) { Text("FINALIZAR VENTA", fontWeight = FontWeight.Black) }
+                            OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(4.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, modifier = Modifier.size(16.dp)); Spacer(modifier = Modifier.width(8.dp)); Text("REGRESAR", fontWeight = FontWeight.Bold, color = Color.Black) }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PaymentSidebarItem(label: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).background(if (isSelected) Color.White else Color.Transparent).border(0.5.dp, Color.Black).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(icon, null, tint = if (isSelected) Color.Blue else Color.Gray, modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(label, fontSize = 9.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Normal, textAlign = TextAlign.Center)
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun POSScreenPreview() {
+    val dummyProducts = listOf(Producto(1, "Coca Cola 2L", "001", 1500, 1000, 24, 5, "Bebidas", "", "123", "EAN", "EMP"))
+    val dummyCart = listOf(CartLine(dummyProducts[0], 2))
+    MultiPOSTheme {
+        POSScreen(dummyProducts, dummyCart, "JUAN PEREZ", "EFECTIVO", 3000, "", false, null, {}, { _, _ -> }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }
