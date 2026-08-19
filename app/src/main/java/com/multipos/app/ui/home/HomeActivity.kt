@@ -114,6 +114,13 @@ class HomeActivity : AppCompatActivity() {
                 val hex = active.colorPrimarioHex
                 companyColor = try { Color(AndroidColor.parseColor(hex)) } catch (e: Exception) { Color(0xFF1E40AF) }
                 
+                // VERIFICACIÓN DE INVENTARIO: Si está vacío, sembrar 30 productos
+                val productCount = db.productoDao().count(active.id)
+                if (productCount == 0) {
+                    android.util.Log.d("HomeActivity", "Inventario vacío detectado para ${active.id}. Sembrando productos...")
+                    com.multipos.app.util.InventorySeeder.seedAbarrotes(db, active.id)
+                }
+
                 val membership = db.usuarioEmpresaDao().getActiveMembership(userId, active.id)
                 activeRole = membership?.rol
                 userRole = activeRole ?: "Sin rol"

@@ -10,9 +10,9 @@ class ReportAggregatorTest {
     @Test
     fun aggregatesTotalsByCategory() {
         val rows = listOf(
-            ReportRow("2026-08-01", ReportsRepository.CAT_VENTAS, "Venta #1", 1_000),
-            ReportRow("2026-08-02", ReportsRepository.CAT_VENTAS, "Venta #2", 2_500),
-            ReportRow("2026-08-03", ReportsRepository.CAT_ANULADAS, "Anulación #3", -500)
+            ReportRow(fecha = "2026-08-01", categoria = ReportsRepository.CAT_VENTAS, concepto = "Venta #1", importe = 1_000L),
+            ReportRow(fecha = "2026-08-02", categoria = ReportsRepository.CAT_VENTAS, concepto = "Venta #2", importe = 2_500L),
+            ReportRow(fecha = "2026-08-03", categoria = ReportsRepository.CAT_ANULADAS, concepto = "Anulación #3", importe = -500L)
         )
         val summary = ReportAggregator.aggregate(rows)
         assertEquals(3_500L, summary.total(ReportsRepository.CAT_VENTAS))

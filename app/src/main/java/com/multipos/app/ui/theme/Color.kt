@@ -31,6 +31,7 @@ val SoftError = Color(0xFFE53935)
 val SoftWarning = Color(0xFFFFB300)
 
 // --- COLORES DE TEXTO ---
+val PremiumCharcoal = Color(0xFF1E293B)        // Gris carbón profundo para sustituir al negro puro
 val TextPrimary = Color(0xFF1A1C1E)            // Texto casi negro para alta legibilidad
 val TextSecondary = Color(0xFF64748B)          // Gris azulado para subtítulos
 val TextMuted = Color(0xFF94A3B8)             // Gris claro para placeholders

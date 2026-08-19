@@ -34,6 +34,7 @@ class EmployeesFragment : Fragment() {
     private lateinit var viewModel: EmployeesViewModel
     
     private var showAddDialog by mutableStateOf(false)
+    private var selectedEmployee by mutableStateOf<Usuario?>(null)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val db = DatabaseProvider.get(requireContext())
@@ -53,16 +54,71 @@ class EmployeesFragment : Fragment() {
                         onSearchChange = { viewModel.onSearchQueryChange(it) },
                         onAddEmployeeClick = { showAddDialog = true },
                         onEditEmployeeClick = { employee ->
-                            Toast.makeText(context, "Detalle: ${employee.nombre}", Toast.LENGTH_SHORT).show()
+                            selectedEmployee = employee
                         }
                     )
 
                     if (showAddDialog) {
                         AddEmployeeDialog(onDismiss = { showAddDialog = false })
                     }
+
+                    selectedEmployee?.let { employee ->
+                        EditEmployeeDialog(
+                            employee = employee,
+                            onDismiss = { selectedEmployee = null },
+                            onSave = { name, role ->
+                                viewModel.updateEmployee(employee.id, name, role) { success, error ->
+                                    if (success) {
+                                        selectedEmployee = null
+                                        Toast.makeText(context, "Colaborador actualizado", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun EditEmployeeDialog(
+        employee: Usuario,
+        onDismiss: () -> Unit,
+        onSave: (String, String) -> Unit
+    ) {
+        var nombre by remember { mutableStateOf(employee.nombre) }
+        var selectedRole by remember { mutableStateOf(employee.rol) }
+        val roles = listOf(Usuario.ROL_ADMINISTRADOR, Usuario.ROL_CAJERO, Usuario.ROL_VENDEDOR)
+        var expanded by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Editar Colaborador") },
+            confirmButton = {
+                TextButton(onClick = { onSave(nombre, selectedRole) }) { Text("Guardar") }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MultiPOSTextField(value = nombre, onValueChange = { nombre = it }, label = "Nombre completo")
+                    Text("Usuario: @${employee.username}", style = MaterialTheme.typography.bodySmall)
+                    
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Rol: $selectedRole")
+                        }
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            roles.forEach { role ->
+                                DropdownMenuItem(text = { Text(role) }, onClick = { selectedRole = role; expanded = false })
+                            }
+                        }
+                    }
+                }
+            }
+        )
     }
 
     @Composable

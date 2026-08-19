@@ -26,8 +26,8 @@ class ReportExportTest {
             "01/01/2026",
             "31/01/2026",
             listOf(
-                ReportRow("05/08/2026 10:00", ReportsRepository.CAT_VENTAS, "Venta \"#1\", EFECTIVO", 1_000),
-                ReportRow("06/08/2026 11:00", ReportsRepository.CAT_VENTAS, "Venta #2", -500)
+                ReportRow(fecha = "05/08/2026 10:00", categoria = ReportsRepository.CAT_VENTAS, concepto = "Venta \"#1\", EFECTIVO", importe = 1_000L),
+                ReportRow(fecha = "06/08/2026 11:00", categoria = ReportsRepository.CAT_VENTAS, concepto = "Venta #2", importe = -500L)
             ),
             ReportSummary(mapOf(ReportsRepository.CAT_NETO to 500L))
         )
@@ -61,7 +61,7 @@ class ReportExportTest {
             "ventas",
             "01/01/2026",
             "31/01/2026",
-            listOf(ReportRow("05/08/2026", ReportsRepository.CAT_VENTAS, "Venta #1", 1_000)),
+            listOf(ReportRow(fecha = "05/08/2026", categoria = ReportsRepository.CAT_VENTAS, concepto = "Venta #1", importe = 1_000L)),
             ReportSummary(mapOf(ReportsRepository.CAT_NETO to 1_000L))
         )
         assertTrue(file.exists())
@@ -78,8 +78,8 @@ class ReportExportTest {
             "01/01/2026",
             "31/01/2026",
             listOf(
-                ReportRow("", ReportsRepository.CAT_STOCK_ACTUAL, "Stock", 12),
-                ReportRow("", ReportsRepository.CAT_ENTRADAS, "Entradas", 5)
+                ReportRow(fecha = "", categoria = ReportsRepository.CAT_STOCK_ACTUAL, concepto = "Stock", importe = 12L),
+                ReportRow(fecha = "", categoria = ReportsRepository.CAT_ENTRADAS, concepto = "Entradas", importe = 5L)
             ),
             ReportSummary(
                 mapOf(

@@ -132,7 +132,7 @@ fun ReportRowPremium(row: ReportRow) {
             Text(text = "Cant: ${row.cantidad}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(
-            text = Money.format(row.total),
+            text = Money.formatPlain(row.total),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.primary

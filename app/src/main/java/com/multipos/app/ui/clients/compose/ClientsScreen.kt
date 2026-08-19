@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.multipos.app.R
 import com.multipos.app.data.entities.Cliente
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
@@ -42,7 +44,7 @@ fun ClientsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Clientes",
+                        text = stringResource(R.string.menu_clients),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -87,9 +89,17 @@ fun ClientsScreen(
             
             // List Container
             MultiPOSCard(modifier = Modifier.weight(1f), elevation = 1.dp) {
-                if (clients.isEmpty()) {
+                if (isLoading) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay clientes registrados", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                } else if (clients.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.PeopleOutline, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text("No hay clientes registrados", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 } else {
                     LazyColumn(

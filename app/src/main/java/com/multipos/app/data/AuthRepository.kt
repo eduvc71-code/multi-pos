@@ -70,6 +70,17 @@ class AuthRepository(private val database: AppDatabase) {
                     Auditoria(
                         empresaId = existing.empresaId,
                         usuarioId = existing.id,
+                        accion = Auditoria.ACCION_LOGIN,
+                        entidad = "usuario",
+                        entidadId = existing.id.toString(),
+                        detalle = "login exitoso",
+                        fecha = ora
+                    )
+                )
+                db.auditoriaDao().insert(
+                    Auditoria(
+                        empresaId = existing.empresaId,
+                        usuarioId = existing.id,
                         accion = Auditoria.ACCION_LOGIN_OK,
                         entidad = "usuario",
                         entidadId = existing.id.toString(),

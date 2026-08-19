@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.multipos.app.R
 import com.multipos.app.data.entities.MovimientoCaja
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
@@ -46,7 +48,7 @@ fun CashScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Gestión de Caja",
+                        text = stringResource(R.string.cash_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -112,7 +114,7 @@ fun CashScreen(
                         }
                     } else {
                         Spacer(modifier = Modifier.height(16.dp))
-                        MultiPOSButton(text = "Abrir Caja", onClick = onOpenCashClick, modifier = Modifier.width(200.dp))
+                        MultiPOSButton(text = stringResource(R.string.cash_open), onClick = onOpenCashClick, modifier = Modifier.width(200.dp))
                     }
                 }
             }
@@ -122,8 +124,8 @@ fun CashScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    MultiPOSOutlineButton(text = "Ingreso", onClick = onAddIncomeClick, modifier = Modifier.weight(1f))
-                    MultiPOSOutlineButton(text = "Egreso", onClick = onAddExpenseClick, modifier = Modifier.weight(1f))
+                    MultiPOSOutlineButton(text = stringResource(R.string.cash_income), onClick = onAddIncomeClick, modifier = Modifier.weight(1f))
+                    MultiPOSOutlineButton(text = stringResource(R.string.cash_expense), onClick = onAddExpenseClick, modifier = Modifier.weight(1f))
                 }
                 
                 Text(

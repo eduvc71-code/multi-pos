@@ -30,6 +30,9 @@ interface UsuarioDao {
     @Update
     suspend fun update(usuario: Usuario)
 
+    @Query("UPDATE usuarios SET nombre = :nombre WHERE id = :id")
+    suspend fun updateName(id: Int, nombre: String)
+
     @Query("SELECT COUNT(*) FROM usuarios")
     suspend fun count(): Int
 @Query("UPDATE usuarios SET intentosFallidos = :attempts, bloqueadoHasta = :lockedUntil WHERE id = :id")
@@ -46,4 +49,7 @@ interface UsuarioDao {
 
     @Query("UPDATE usuarios SET password = '', passwordHash = :hash, passwordSalt = :salt, requiereCambioClave = 1 WHERE id = :id")
     suspend fun upgradeLegacyPassword(id: Int, hash: String, salt: String)
+
+    @Query("DELETE FROM usuarios WHERE empresaId = :empresaId")
+    suspend fun deleteByCompany(empresaId: String)
 }

@@ -89,6 +89,20 @@ class EmployeesViewModel(
             }
         }
     }
+
+    fun updateEmployee(userId: Int, nombre: String, rol: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    usuarioDao.updateName(userId, nombre)
+                    usuarioEmpresaDao.updateRol(userId, companyId, rol)
+                }
+                onResult(true, null)
+            } catch (e: Exception) {
+                onResult(false, e.message)
+            }
+        }
+    }
 }
 
 class EmployeesViewModelFactory(

@@ -23,4 +23,7 @@ interface EmpresaDao {
 
     @Query("SELECT COUNT(*) FROM empresas")
     suspend fun count(): Int
+
+    @Query("DELETE FROM empresas WHERE id = :id")
+    suspend fun deleteById(id: String)
 }

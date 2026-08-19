@@ -23,7 +23,8 @@ class ReportesFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val db = DatabaseProvider.get(requireContext())
         val companyId = ActiveCompanyStore.get(requireContext())
-        val factory = ReportsViewModelFactory(db, companyId)
+        val userId = com.multipos.app.data.UserSessionStore.userId(requireContext())
+        val factory = ReportsViewModelFactory(db, companyId, userId)
         viewModel = ViewModelProvider(this, factory)[ReportsViewModel::class.java]
 
         return ComposeView(requireContext()).apply {
@@ -32,7 +33,7 @@ class ReportesFragment : Fragment() {
                 MultiPOSTheme {
                     val state by viewModel.uiState.collectAsState()
                     ReportsScreen(
-                        reportType = state.reportType,
+                        reportType = state.reportType.name,
                         reportData = state.reportData,
                         isLoading = state.isLoading,
                         onGenerateReport = { viewModel.generateReport() },

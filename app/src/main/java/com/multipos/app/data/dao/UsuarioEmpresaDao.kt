@@ -34,6 +34,9 @@ interface UsuarioEmpresaDao {
     @Query("UPDATE usuarios SET activo = 1 WHERE id = :userId")
     suspend fun reactivateUserAccount(userId: Int): Int
 
+    @Query("UPDATE usuario_empresas SET rol = :rol WHERE usuarioId = :userId AND empresaId = :companyId")
+    suspend fun updateRol(userId: Int, companyId: String, rol: String)
+
     @Query("SELECT u.* FROM usuarios u INNER JOIN usuario_empresas ue ON ue.usuarioId = u.id WHERE ue.empresaId = :companyId AND ue.activo = 1")
     fun getUsersForCompany(companyId: String): Flow<List<Usuario>>
 }

@@ -23,6 +23,7 @@ data class Auditoria(
     val fecha: Long = System.currentTimeMillis()
 ) {
     companion object {
+        const val ACCION_LOGIN = "LOGIN"
         const val ACCION_LOGIN_OK = "LOGIN_OK"
         const val ACCION_LOGIN_BLOQUEADO = "LOGIN_BLOQUEADO"
         const val ACCION_CAJA_APERTURA = "CAJA_APERTURA"

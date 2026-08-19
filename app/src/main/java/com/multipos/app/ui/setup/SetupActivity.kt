@@ -19,6 +19,7 @@ import com.multipos.app.security.PasswordHasher
 import com.multipos.app.ui.home.HomeActivity
 import com.multipos.app.ui.setup.compose.SetupScreen
 import com.multipos.app.ui.theme.MultiPOSTheme
+import com.multipos.app.util.InventorySeeder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -124,10 +125,18 @@ class SetupActivity : ComponentActivity() {
                     createdUser = db.usuarioDao().getById(id)
                 }
                 val owner = checkNotNull(createdUser)
+                
+                // Sembrar productos de abarrotes inmediatamente
+                InventorySeeder.seedAbarrotes(db, company.id)
+                
                 ActiveCompanyStore.set(this@SetupActivity, company.id)
                 ActiveCompanyStore.setColor(this@SetupActivity, company.colorPrimarioHex)
                 UserSessionStore.set(this@SetupActivity, owner)
-                startActivity(Intent(this@SetupActivity, HomeActivity::class.java))
+                
+                val intent = Intent(this@SetupActivity, HomeActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
                 finishAffinity()
             } catch (e: Exception) {
                 setLoading(false)

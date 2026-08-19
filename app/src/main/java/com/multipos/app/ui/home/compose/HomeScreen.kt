@@ -63,21 +63,21 @@ fun HomeScreen(
                         }
                         TextButton(
                             onClick = onLogoutClick,
-                            contentPadding = PaddingValues(0.dp),
-                            modifier = Modifier.height(28.dp)
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+                            modifier = Modifier.height(48.dp) // Aumentado a 48dp para touch target estándar
                         ) {
-                            Text("SALIR", color = MaterialTheme.colorScheme.error, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                            Text("SALIR", color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Black)
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     
-                    // Menu Horizontal Ultra Compacto
+                    // Menu Horizontal con botones más grandes
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         MenuItem(Icons.Default.Analytics, "Inicio", selectedMenu == "DASHBOARD", companyColor) { onMenuItemClick("DASHBOARD") }
                         MenuItem(Icons.Default.ShoppingCart, "Ventas", selectedMenu == "POS", companyColor) { onMenuItemClick("POS") }
@@ -107,12 +107,12 @@ fun MenuItem(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.height(34.dp), // Reducido a 34dp
-        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.height(48.dp), // Target táctil de 48dp
+        shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSelected) accentColor else MaterialTheme.colorScheme.surfaceVariant
         ),
-        contentPadding = PaddingValues(horizontal = 10.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(

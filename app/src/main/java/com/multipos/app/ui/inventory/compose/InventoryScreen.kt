@@ -92,7 +92,7 @@ fun InventoryScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .border(1.dp, Color.Black)
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
                     .background(Color.White)
             ) {
                 Column {
@@ -100,8 +100,8 @@ fun InventoryScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFFE0E0E0))
-                            .border(androidx.compose.foundation.BorderStroke(0.5.dp, Color.Black)),
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .border(androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableCellHeader("PRODUCTO", Icons.Default.Inventory2, Modifier.weight(0.45f))
@@ -110,9 +110,17 @@ fun InventoryScreen(
                         TableCellHeader("STOCK\n(ACT)", Icons.Default.Inventory, Modifier.weight(0.19f))
                     }
 
-                    if (products.isEmpty()) {
+                    if (isLoading) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No hay resultados", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    } else if (products.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.Inventory, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text("No hay resultados", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                            }
                         }
                     } else {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -135,18 +143,19 @@ fun InventoryScreen(
 fun TableCellHeader(text: String, icon: ImageVector, modifier: Modifier) {
     Column(
         modifier = modifier
-            .border(0.5.dp, Color.Black)
+            .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(icon, null, modifier = Modifier.size(14.dp), tint = Color.DarkGray)
+        Icon(icon, null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f))
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center,
-            lineHeight = 10.sp
+            lineHeight = 10.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -156,14 +165,14 @@ fun TableCell(text: String, modifier: Modifier, alignEnd: Boolean = false, color
     Text(
         text = text,
         modifier = modifier
-            .border(0.5.dp, Color.Black)
+            .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
             .padding(8.dp),
         style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
         fontWeight = FontWeight.Bold,
         textAlign = if (alignEnd) TextAlign.End else TextAlign.Start,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        color = color
+        color = if (color == Color.Black) MaterialTheme.colorScheme.onSurface else color
     )
 }
 
@@ -177,7 +186,7 @@ fun ProductRowExcel(product: Producto, onEdit: () -> Unit, onDelete: () -> Unit)
             // Solo números (formatPlain)
             TableCell(Money.formatPlain(product.costoUnitario), Modifier.weight(0.18f), alignEnd = true)
             TableCell(Money.formatPlain(product.precioVenta), Modifier.weight(0.18f), alignEnd = true, color = MaterialTheme.colorScheme.primary)
-            TableCell(product.stock.toString(), Modifier.weight(0.19f), alignEnd = true)
+            TableCell(product.stock.toString(), Modifier.weight(0.19f), alignEnd = true, color = if(product.stock <= 5) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
         }
         
         if (showActions) {
@@ -185,12 +194,12 @@ fun ProductRowExcel(product: Producto, onEdit: () -> Unit, onDelete: () -> Unit)
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f))
-                    .border(0.5.dp, Color.Black)
+                    .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) }
-                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, null, tint = Color.Red, modifier = Modifier.size(20.dp)) }
+                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp)) }
             }
         }
     }
