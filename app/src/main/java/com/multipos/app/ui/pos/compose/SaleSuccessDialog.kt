@@ -39,13 +39,13 @@ fun SaleSuccessDialog(folio: String, total: Long, onDismiss: () -> Unit) {
                     }
                 }
                 Text(
-                    "¡VENTA EXITOSA!",
+                    stringResource(R.string.common_sale_success),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Folio: $folio", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.common_folio, folio), style = MaterialTheme.typography.bodyMedium)
                     Text(
                         Money.format(total),
                         style = MaterialTheme.typography.displayMedium,
@@ -53,7 +53,7 @@ fun SaleSuccessDialog(folio: String, total: Long, onDismiss: () -> Unit) {
                     )
                 }
                 HorizontalDivider()
-                MultiPOSButton(text = "Nueva Venta", onClick = onDismiss)
+                MultiPOSButton(text = stringResource(R.string.common_new_sale), onClick = onDismiss)
             }
         }
     }

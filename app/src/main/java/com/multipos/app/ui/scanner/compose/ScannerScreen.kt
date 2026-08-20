@@ -96,7 +96,7 @@ fun ScannerScreen(
                         OutlinedTextField(
                             value = manualCode,
                             onValueChange = { manualCode = it },
-                            placeholder = { Text("Ingresar código manual", color = Color.Gray) },
+                            placeholder = { Text(stringResource(R.string.scanner_manual_code), color = Color.Gray) },
                             modifier = Modifier.weight(1f),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Color.White,
@@ -111,7 +111,7 @@ fun ScannerScreen(
                             enabled = manualCode.isNotBlank(),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("USAR")
+                            Text(stringResource(R.string.scanner_manual_use))
                         }
                     }
                 }

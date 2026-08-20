@@ -75,7 +75,7 @@ fun EmployeesScreen(
             MultiPOSCard(modifier = Modifier.weight(1f), elevation = 1.dp) {
                 if (employees.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay colaboradores", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.employees_no_collaborators), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     LazyColumn(

@@ -105,7 +105,7 @@ fun ReportsScreen(
             }
         } else if (!isLoading) {
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Inicia una consulta para ver resultados", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.reports_start_query), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

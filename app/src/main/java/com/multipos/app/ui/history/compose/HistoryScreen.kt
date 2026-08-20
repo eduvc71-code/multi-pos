@@ -13,9 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multipos.app.R
 import com.multipos.app.data.entities.Venta
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSSearchField
@@ -86,7 +88,7 @@ fun HistoryScreen(
                 }
             } else if (sales.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay transacciones", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.history_no_transactions), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -146,7 +148,7 @@ fun SaleListItemPremium(sale: Venta, onClick: () -> Unit) {
             )
             if (sale.estado == Venta.ESTADO_ANULADA) {
                 Text(
-                    text = "ANULADA",
+                    text = stringResource(R.string.sale_detail_annulled_badge),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.error

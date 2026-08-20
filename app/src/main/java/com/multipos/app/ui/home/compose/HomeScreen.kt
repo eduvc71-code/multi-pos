@@ -66,7 +66,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 12.dp),
                             modifier = Modifier.height(48.dp) // Aumentado a 48dp para touch target estándar
                         ) {
-                            Text("SALIR", color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                            Text(stringResource(R.string.home_logout), color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Black)
                         }
                     }
                     

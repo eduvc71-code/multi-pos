@@ -132,7 +132,7 @@ fun POSScreenWrapper(
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Buscando producto en la red...", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.product_detected_searching), style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
@@ -168,15 +168,15 @@ private fun QuickAddDialog(
     var price by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Producto Detectado") },
+        title = { Text(stringResource(R.string.product_detected_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(product.nombre, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                Text("Este producto no está en tu inventario. Ingresa un precio para venderlo ahora y guardarlo.")
+                Text(stringResource(R.string.product_detected_message))
                 TextField(
                     value = price,
                     onValueChange = { price = it },
-                    label = { Text("Precio de Venta") },
+                    label = { Text(stringResource(R.string.product_detected_price_label)) },
                     singleLine = true
                 )
             }
@@ -185,9 +185,9 @@ private fun QuickAddDialog(
             TextButton(onClick = {
                 val p = com.multipos.app.util.Money.parseMinorUnits(price) ?: 0L
                 if (p > 0) onAdd(p)
-            }) { Text("AGREGAR Y GUARDAR") }
+            }) { Text(stringResource(R.string.product_detected_add_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("CANCELAR") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } }
     )
 }
 

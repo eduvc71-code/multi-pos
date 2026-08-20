@@ -13,8 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.multipos.app.R
 import com.multipos.app.data.entities.*
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.util.Money
@@ -147,7 +149,7 @@ fun SaleDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     InfoRow(
-                        "TOTAL",
+                        stringResource(R.string.sale_detail_total_label),
                         Money.format(sale.total),
                         MaterialTheme.colorScheme.primary,
                         FontWeight.Bold
@@ -202,7 +204,7 @@ fun SaleDetailScreen(
                     ) {
                         Icon(Icons.Default.Cancel, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Anular Venta Completa")
+                        Text(stringResource(R.string.sale_detail_annul_complete))
                     }
                 }
                 
@@ -216,7 +218,7 @@ fun SaleDetailScreen(
                 ) {
                     Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Registrar Devolución Parcial")
+                    Text(stringResource(R.string.sale_detail_partial_return))
                 }
             }
             

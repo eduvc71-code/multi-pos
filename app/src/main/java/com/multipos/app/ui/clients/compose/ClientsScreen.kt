@@ -98,7 +98,7 @@ fun ClientsScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.PeopleOutline, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("No hay clientes registrados", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.clients_no_clients), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else {
