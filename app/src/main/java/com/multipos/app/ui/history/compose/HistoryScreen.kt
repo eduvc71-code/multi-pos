@@ -44,7 +44,7 @@ fun HistoryScreen(
     ) {
         // Header Executive
         Text(
-            text = "Historial",
+            text = stringResource(R.string.history_title),
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground
@@ -54,7 +54,7 @@ fun HistoryScreen(
         MultiPOSSearchField(
             value = searchQuery,
             onValueChange = onSearchChange,
-            placeholder = "Folio o cliente..."
+            placeholder = stringResource(R.string.history_search_placeholder)
         )
         
         // Summary Card
@@ -65,7 +65,7 @@ fun HistoryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "TOTAL HOY",
+                    text = stringResource(R.string.history_total_today),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -118,7 +118,7 @@ fun SaleListItemPremium(sale: Venta, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Folio #${sale.id}",
+                text = stringResource(R.string.history_folio_prefix, sale.id.toString()),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )

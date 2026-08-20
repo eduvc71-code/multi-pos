@@ -447,4 +447,120 @@
 
     <!-- Reports Screen -->
     <string name="reports_start_query">Inicia una consulta para ver resultados</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">MultiPOS</string>
+    <string name="login_subtitle">Caja • Ventas • Créditos</string>
+    <string name="login_section_title">Iniciar Sesión</string>
+    <string name="login_description">Ingresa con tus credenciales asignadas</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_footer">MultiPOS · Punto de Venta v2.0</string>
+    
+    <!-- History Screen -->
+    <string name="history_title">Historial</string>
+    <string name="history_search_placeholder">Folio o cliente...</string>
+    <string name="history_total_today">TOTAL HOY</string>
+    <string name="history_folio_prefix">Folio #%1$s</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_title">Detalle de Venta</string>
+    <string name="sale_detail_back">Regresar</string>
+    <string name="sale_detail_refunds_title">Devoluciones Realizadas</string>
+    <string name="sale_detail_products_title">Productos</string>
+    <string name="sale_detail_product_default">Producto #%1$d</string>
+    <string name="sale_detail_quantity_format">Cantidad: %1$d</string>
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_partial_refund">Registrar Devolución Parcial</string>
+    
+    <!-- Inventory Screen -->
+    <string name="inventory_title">Inventario</string>
+    <string name="inventory_header_cost">COSTO\n(UNIT)</string>
+    <string name="inventory_header_price">PRECIO\n(VENTA)</string>
+    <string name="inventory_header_stock">STOCK\n(ACT)</string>
+    
+    <!-- Employees Screen -->
+    <string name="employees_title">Equipo</string>
+    <string name="employees_search_placeholder">Buscar colaborador...</string>
+    <string name="employees_no_collaborators">No hay colaboradores</string>
+    
+    <!-- Clients Screen -->
+    <string name="clients_no_clients">No hay clientes registrados</string>
+    
+    <!-- Cash Screen -->
+    <string name="cash_no_movements">No hay movimientos</string>
+    
+    <!-- Reports Screen -->
+    <string name="reports_title">Reportes</string>
+    <string name="reports_selected_label">REPORTE SELECCIONADO</string>
+    <string name="reports_generate_button">Generar Ahora</string>
+    <string name="reports_row_quantity_prefix">Cant: %1$d</string>
+    
+    <!-- Home Activity -->
+    <string name="home_company_loading">Cargando...</string>
+    <string name="home_menu_dashboard">DASHBOARD</string>
+    <string name="home_no_permission">No tienes permiso</string>
+    <string name="home_logout_button">SALIR</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_sales_today">VENTAS HOY</string>
+    <string name="dashboard_alerts">ALERTAS</string>
+    <string name="dashboard_income_by_method">INGRESOS POR MEDIO</string>
+    <string name="dashboard_low_stock_alert">Stock bajo: %1$s</string>
+    <string name="dashboard_out_of_stock_alert">Sin stock: %1$s</string>
+    
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_title">Estado de Cuenta</string>
+    <string name="estado_cuenta_from">Desde</string>
+    <string name="estado_cuenta_to">Hasta</string>
+    <string name="estado_cuenta_pay">Abonar</string>
+    <string name="estado_cuenta_no_movements">Sin movimientos</string>
+    
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_input">Ingresar código manual</string>
+    <string name="scanner_use_button">USAR</string>
+    
+    <!-- Sale Success Dialog -->
+    <string name="sale_success_folio">Folio:</string>
+    
+    <!-- POS Screen -->
+    <string name="pos_select_quantity_title">SELECCIONAR CANTIDAD</string>
+    <string name="pos_finalize_sale">FINALIZAR VENTA</string>
+    <string name="pos_change_label">CAMBIO (VUELTO)</string>
+    <string name="pos_product_detected_title">Producto Detectado</string>
+    <string name="pos_product_not_in_inventory">El producto no está en el inventario</string>
+    <string name="pos_add_save_button">AGREGAR Y GUARDAR</string>
+    <string name="pos_cancel_button">CANCELAR</string>
+    <string name="pos_product_name_label">Nombre</string>
+    <string name="pos_product_cost_label">Costo</string>
+    <string name="pos_product_price_label">Precio</string>
+    <string name="pos_product_stock_label">Stock inicial</string>
+    <string name="pos_product_barcode_label">Código de barras</string>
+    <string name="pos_quick_add_title">AGREGAR RÁPIDO</string>
+    <string name="pos_existing_product_message">Producto existente. ¿Deseas agregarlo al carrito?</string>
+    <string name="pos_add_to_cart_button">Agregar al Carrito</string>
+    <string name="pos_new_product_message">Producto nuevo. ¿Deseas registrarlo y agregarlo?</string>
+    <string name="pos_register_add_button">Registrar y Agregar</string>
+    <string name="pos_scanned_product">Producto Escaneado</string>
+    <string name="pos_scan_again">Escanear otro</string>
+    <string name="pos_manual_code">Código Manual</string>
+    <string name="pos_enter_code_placeholder">Ingresa el código</string>
+    <string name="pos_search_product">Buscar producto...</string>
+    <string name="pos_no_results">No hay resultados</string>
+    <string name="pos_empty_cart_message">Agrega productos para comenzar la venta</string>
+    <string name="pos_items_count">%1$d artículos</string>
+    <string name="pos_total_label">TOTAL</string>
+    <string name="pos_payment_method">MÉTODO DE PAGO</string>
+    <string name="pos_cash">Efectivo</string>
+    <string name="pos_card">Tarjeta</string>
+    <string name="pos_transfer">Transferencia</string>
+    <string name="pos_credit_qr">Crédito QR</string>
+    <string name="pos_received_label">RECIBIDO</string>
+    <string name="pos_insufficient_received">Monto insuficiente</string>
+    <string name="pos_client_label">CLIENTE</string>
+    <string name="pos_select_client">Seleccionar cliente</string>
+    <string name="pos_no_client">Sin cliente</string>
+    <string name="pos_clear_cart">Limpiar carrito</string>
+    <string name="pos_confirm_clear">¿Estás seguro de limpiar el carrito?</string>
+    <string name="pos_keep_cart">Mantener</string>
+    <string name="pos_clear_button">Limpiar</string>
 </resources>

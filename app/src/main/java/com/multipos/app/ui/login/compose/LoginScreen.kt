@@ -107,7 +107,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "MultiPOS",
+                text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.displaySmall, // Un poco más pequeño para que no wrapée
                 fontWeight = FontWeight.Black,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -115,7 +115,7 @@ fun LoginScreen(
             )
             
             Text(
-                text = "Caja • Ventas • Créditos".uppercase(),
+                text = stringResource(R.string.login_subtitle).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -141,13 +141,13 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Iniciar Sesión",
+                        text = stringResource(R.string.login_section_title),
                         style = MaterialTheme.typography.titleMedium, // Reducido para mejor balance
                         fontWeight = FontWeight.Black
                     )
                     
                     Text(
-                        text = "Ingresa con tus credenciales asignadas",
+                        text = stringResource(R.string.login_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -184,7 +184,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     MultiPOSButton(
-                        text = "Entrar",
+                        text = stringResource(R.string.login_button),
                         onClick = onLoginClick,
                         showLoading = isLoading
                     )
@@ -205,7 +205,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.weight(1f))
             
             Text(
-                text = "MultiPOS · Punto de Venta v2.0",
+                text = stringResource(R.string.login_footer),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.padding(bottom = 24.dp)
