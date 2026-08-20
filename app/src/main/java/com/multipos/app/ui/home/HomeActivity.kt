@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -214,7 +213,7 @@ class HomeActivity : ComponentActivity() {
             val companies = db.usuarioEmpresaDao().getCompaniesForUser(userId).first()
             val options = companies.map { it.nombre }.toTypedArray()
             
-            AlertDialog.Builder(this@HomeActivity)
+            androidx.appcompat.app.AlertDialog.Builder(this@HomeActivity)
                 .setTitle(R.string.home_select_company_title)
                 .setItems(options) { _, which ->
                     val selected = companies[which]
