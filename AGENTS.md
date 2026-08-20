@@ -43,7 +43,6 @@ MultiPOS es una aplicación Android nativa para punto de venta.
 
 - Conserva el lenguaje visual existente de los layouts XML.
 - Prioriza legibilidad en pantallas pequeñas, estados vacíos claros y mensajes de error accionables.
-- No migres a Jetpack Compose salvo solicitud explícita.
 - Usa recursos de `strings.xml`, `colors.xml` y `themes.xml`; evita textos y colores duplicados en layouts o código.
 - Para ventas, inventario y clientes, evita acciones destructivas accidentales y muestra confirmación cuando corresponda.
 
