@@ -54,7 +54,7 @@ fun SaleDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Regresar"
+                            contentDescription = stringResource(R.string.sale_detail_back)
                         )
                     }
                 },
@@ -101,7 +101,7 @@ fun SaleDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Venta #${sale.id}",
+                            text = stringResource(R.string.history_folio_prefix, sale.id.toString()),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurface
@@ -160,7 +160,7 @@ fun SaleDetailScreen(
             // Sección de Devoluciones (si existen)
             if (refunds.isNotEmpty()) {
                 Text(
-                    text = "Devoluciones Realizadas",
+                    text = stringResource(R.string.sale_detail_refunds_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error
@@ -173,7 +173,7 @@ fun SaleDetailScreen(
                                 Text(text = dateFormat.format(Date(refund.fecha)), style = MaterialTheme.typography.bodySmall)
                                 Text(text = Money.format(refund.monto), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
                             }
-                            Text(text = "Motivo: ${refund.motivo}", style = MaterialTheme.typography.bodySmall)
+                            Text(text = stringResource(R.string.sale_detail_refund_reason_prefix, refund.motivo), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
@@ -181,7 +181,7 @@ fun SaleDetailScreen(
             
             // Lista de items
             Text(
-                text = "Productos",
+                text = stringResource(R.string.sale_detail_products_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -271,7 +271,7 @@ fun SaleDetailItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = detail.nombreProductoSnapshot.ifBlank { "Producto #${detail.idProducto}" },
+                    text = detail.nombreProductoSnapshot.ifBlank { stringResource(R.string.sale_detail_product_default, detail.idProducto) },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -281,7 +281,7 @@ fun SaleDetailItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "Cantidad: ${detail.cantidad}",
+                    text = stringResource(R.string.sale_detail_quantity_format, detail.cantidad),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

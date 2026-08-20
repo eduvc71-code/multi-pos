@@ -471,6 +471,7 @@
     <string name="sale_detail_quantity_format">Cantidad: %1$d</string>
     <string name="sale_detail_annul_complete">Anular Venta Completa</string>
     <string name="sale_detail_partial_refund">Registrar Devolución Parcial</string>
+    <string name="sale_detail_refund_reason_prefix">Motivo: %1$s</string>
     
     <!-- Inventory Screen -->
     <string name="inventory_title">Inventario</string>
