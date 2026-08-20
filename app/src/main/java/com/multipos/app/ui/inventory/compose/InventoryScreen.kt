@@ -49,7 +49,7 @@ fun InventoryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Inventario",
+                        text = stringResource(R.string.inventory_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -107,9 +107,9 @@ fun InventoryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableCellHeader(stringResource(R.string.inventory_table_header_product), Icons.Default.Inventory2, Modifier.weight(0.45f))
-                        TableCellHeader("COSTO\n(UNIT)", Icons.Default.AttachMoney, Modifier.weight(0.18f))
-                        TableCellHeader("PRECIO\n(VENTA)", Icons.Default.Sell, Modifier.weight(0.18f))
-                        TableCellHeader("STOCK\n(ACT)", Icons.Default.Inventory, Modifier.weight(0.19f))
+                        TableCellHeader(stringResource(R.string.inventory_header_cost), Icons.Default.AttachMoney, Modifier.weight(0.18f))
+                        TableCellHeader(stringResource(R.string.inventory_header_price), Icons.Default.Sell, Modifier.weight(0.18f))
+                        TableCellHeader(stringResource(R.string.inventory_header_stock), Icons.Default.Inventory, Modifier.weight(0.19f))
                     }
 
                     if (isLoading) {

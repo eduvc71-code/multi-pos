@@ -47,7 +47,7 @@ fun ReportsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Reportes",
+                text = stringResource(R.string.reports_title),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Black,
                 color = MaterialTheme.colorScheme.onBackground
@@ -64,7 +64,7 @@ fun ReportsScreen(
         MultiPOSCard(elevation = 2.dp) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    text = "REPORTE SELECCIONADO",
+                    text = stringResource(R.string.reports_selected_label),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -77,7 +77,7 @@ fun ReportsScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 MultiPOSButton(
-                    text = "Generar Ahora",
+                    text = stringResource(R.string.reports_generate_button),
                     onClick = onGenerateReport,
                     showLoading = isLoading
                 )
@@ -129,7 +129,7 @@ fun ReportRowPremium(row: ReportRow) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = row.descripcion, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-            Text(text = "Cant: ${row.cantidad}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = stringResource(R.string.reports_row_quantity_prefix, row.cantidad), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(
             text = Money.formatPlain(row.total),

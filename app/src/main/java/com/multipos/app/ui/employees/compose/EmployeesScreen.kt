@@ -39,7 +39,7 @@ fun EmployeesScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Equipo",
+                        text = stringResource(R.string.employees_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -68,7 +68,7 @@ fun EmployeesScreen(
             MultiPOSSearchField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = "Buscar colaborador..."
+                placeholder = stringResource(R.string.employees_search_placeholder)
             )
             
             // Container tipo lista única
