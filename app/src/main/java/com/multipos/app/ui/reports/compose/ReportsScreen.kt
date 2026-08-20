@@ -87,8 +87,8 @@ fun ReportsScreen(
         if (reportData != null) {
             // Hero Metrics
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ReportMetricSmall(label = "VENTAS", value = Money.format(reportData.totalVentas), modifier = Modifier.weight(1f))
-                ReportMetricSmall(label = "GANANCIA", value = Money.format(reportData.totalGanancia), modifier = Modifier.weight(1f))
+                ReportMetricSmall(label = stringResource(R.string.report_sales_label), value = Money.format(reportData.totalVentas), modifier = Modifier.weight(1f))
+                ReportMetricSmall(label = stringResource(R.string.report_profit_label), value = Money.format(reportData.totalGanancia), modifier = Modifier.weight(1f))
             }
 
             // Results Container

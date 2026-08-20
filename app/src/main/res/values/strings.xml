@@ -564,4 +564,41 @@
     <string name="pos_confirm_clear">¿Estás seguro de limpiar el carrito?</string>
     <string name="pos_keep_cart">Mantener</string>
     <string name="pos_clear_button">Limpiar</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_title">Detalle de Venta</string>
+    <string name="sale_detail_date_label">Fecha</string>
+    <string name="sale_detail_seller_label">Vendedor</string>
+    <string name="sale_detail_customer_label">Cliente</string>
+    <string name="sale_detail_payment_method_label">Método de pago</string>
+    <string name="sale_detail_subtotal_label">Subtotal</string>
+    <string name="sale_detail_discount_label">Descuento</string>
+    <string name="sale_detail_tax_label">Impuesto</string>
+    <string name="sale_detail_unit_price_prefix">Precio unit: </string>
+    
+    <!-- Login Screen -->
+    <string name="login_exit_content_desc">Salir</string>
+    <string name="login_logo_content_desc">Logo</string>
+    <string name="login_toast_credentials">Ingresa tu usuario y contraseña</string>
+    <string name="login_error_open_home">Error al iniciar: %1$s</string>
+    
+    <!-- Home Activity -->
+    <string name="home_company_loading">Cargando...</string>
+    <string name="home_no_role">Sin rol</string>
+    <string name="home_select_company_title">Seleccionar Empresa</string>
+    <string name="home_no_permission_toast">No tienes permiso</string>
+    
+    <!-- Home Screen Menu Items -->
+    <string name="menu_pos_short">POS</string>
+    <string name="menu_dashboard_item">Inicio</string>
+    <string name="menu_sales_item">Ventas</string>
+    
+    <!-- Navigation Wrappers -->
+    <string name="nav_scan_product">Escanear producto</string>
+    <string name="nav_scan_client_qr">Escanear QR de cliente</string>
+    
+    <!-- Reports Screen -->
+    <string name="report_sales_label">VENTAS</string>
+    <string name="report_profit_label">GANANCIA</string>
+    
 </resources>

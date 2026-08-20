@@ -102,13 +102,13 @@ fun POSScreenWrapper(
                         }
                     }
                 }
-                openScanner("Escanear producto")
+                openScanner(stringResource(R.string.nav_scan_product))
             },
             onScanClientQr = {
                 scanCallback = { code, _ ->
                     viewModel.setClient(code)
                 }
-                openScanner("Escanear QR de cliente")
+                openScanner(stringResource(R.string.nav_scan_client_qr))
             },
             onClearWarning = { viewModel.clearWarning() }
         )

@@ -45,7 +45,7 @@ fun SaleDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Detalle de Venta",
+                        text = stringResource(R.string.sale_detail_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -131,19 +131,19 @@ fun SaleDetailScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    InfoRow("Fecha", dateFormat.format(Date(sale.fecha)))
-                    InfoRow("Vendedor", vendedorName)
-                    InfoRow("Cliente", clienteName)
-                    InfoRow("Método de pago", sale.tipoPago)
+                    InfoRow(stringResource(R.string.sale_detail_date_label), dateFormat.format(Date(sale.fecha)))
+                    InfoRow(stringResource(R.string.sale_detail_seller_label), vendedorName)
+                    InfoRow(stringResource(R.string.sale_detail_customer_label), clienteName)
+                    InfoRow(stringResource(R.string.sale_detail_payment_method_label), sale.tipoPago)
                     
                     Divider(modifier = Modifier.padding(vertical = 12.dp))
                     
-                    InfoRow("Subtotal", Money.format(sale.subtotal))
+                    InfoRow(stringResource(R.string.sale_detail_subtotal_label), Money.format(sale.subtotal))
                     if (sale.descuento > 0) {
-                        InfoRow("Descuento", "-${Money.format(sale.descuento)}", Color.Red)
+                        InfoRow(stringResource(R.string.sale_detail_discount_label), "-${Money.format(sale.descuento)}", Color.Red)
                     }
                     if (sale.impuesto > 0) {
-                        InfoRow("Impuesto", Money.format(sale.impuesto))
+                        InfoRow(stringResource(R.string.sale_detail_tax_label), Money.format(sale.impuesto))
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -287,7 +287,7 @@ fun SaleDetailItem(
                 )
                 
                 Text(
-                    text = "Precio unit: ${Money.format(detail.precioUnitario)}",
+                    text = stringResource(R.string.sale_detail_unit_price_prefix) + Money.format(detail.precioUnitario),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

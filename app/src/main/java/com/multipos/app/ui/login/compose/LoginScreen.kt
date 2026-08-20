@@ -63,7 +63,7 @@ fun LoginScreen(
                 .align(Alignment.TopEnd)
                 .padding(top = 16.dp)
         ) {
-            Icon(Icons.Default.Close, contentDescription = "Salir", tint = Color.Gray)
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.login_exit_content_desc), tint = Color.Gray)
         }
 
         Column(
@@ -96,7 +96,7 @@ fun LoginScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Logo",
+                            contentDescription = stringResource(R.string.login_logo_content_desc),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(40.dp)
                         )
@@ -157,7 +157,7 @@ fun LoginScreen(
                     MultiPOSTextField(
                         value = username,
                         onValueChange = onUsernameChange,
-                        label = "Usuario",
+                        label = stringResource(R.string.login_hint_user),
                         leadingIcon = {
                             Icon(Icons.Default.Person, null, tint = MaterialTheme.colorScheme.primary)
                         }
@@ -166,7 +166,7 @@ fun LoginScreen(
                     MultiPOSTextField(
                         value = password,
                         onValueChange = onPasswordChange,
-                        label = "Contraseña",
+                        label = stringResource(R.string.login_hint_pass),
                         leadingIcon = {
                             Icon(Icons.Default.Lock, null, tint = MaterialTheme.colorScheme.primary)
                         },

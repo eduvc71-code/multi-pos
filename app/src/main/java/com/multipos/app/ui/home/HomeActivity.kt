@@ -37,9 +37,9 @@ import kotlinx.coroutines.launch
 
 class HomeActivity : ComponentActivity() {
     
-    private var activeCompanyName by mutableStateOf("Cargando...")
+    private var activeCompanyName by mutableStateOf(getString(R.string.home_company_loading))
     private var userName by mutableStateOf("...")
-    private var userRole by mutableStateOf("...")
+    private var userRole by mutableStateOf(getString(R.string.home_no_role))
     private var companyColor by mutableStateOf(Color(0xFF1E40AF))
     private var selectedMenu by mutableStateOf("DASHBOARD")
     private var activeRole: String? = null
@@ -83,7 +83,7 @@ class HomeActivity : ComponentActivity() {
                                 restoreState = true
                             }
                         } else {
-                            Toast.makeText(this@HomeActivity, "No tienes permiso", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@HomeActivity, R.string.home_no_permission_toast, Toast.LENGTH_SHORT).show()
                         }
                     },
                     selectedMenu = selectedMenu
@@ -215,7 +215,7 @@ class HomeActivity : ComponentActivity() {
             val options = companies.map { it.nombre }.toTypedArray()
             
             AlertDialog.Builder(this@HomeActivity)
-                .setTitle("Seleccionar Empresa")
+                .setTitle(R.string.home_select_company_title)
                 .setItems(options) { _, which ->
                     val selected = companies[which]
                     ActiveCompanyStore.set(this@HomeActivity, selected.id)
