@@ -39,7 +39,7 @@ fun EmployeesScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Equipo",
+                        text = stringResource(R.string.employees_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -68,14 +68,14 @@ fun EmployeesScreen(
             MultiPOSSearchField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = "Buscar colaborador..."
+                placeholder = stringResource(R.string.employees_search_placeholder)
             )
             
             // Container tipo lista única
             MultiPOSCard(modifier = Modifier.weight(1f), elevation = 1.dp) {
                 if (employees.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay colaboradores", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.employees_no_collaborators), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     LazyColumn(

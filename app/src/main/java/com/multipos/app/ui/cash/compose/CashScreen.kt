@@ -109,8 +109,8 @@ fun CashScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SummaryItemPremium(label = "INGRESOS", value = Money.format(ingresos), color = MaterialTheme.colorScheme.primary)
-                            SummaryItemPremium(label = "EGRESOS", value = Money.format(egresos), color = MaterialTheme.colorScheme.error)
+                            SummaryItemPremium(label = stringResource(R.string.cash_summary_income), value = Money.format(ingresos), color = MaterialTheme.colorScheme.primary)
+                            SummaryItemPremium(label = stringResource(R.string.cash_summary_expense), value = Money.format(egresos), color = MaterialTheme.colorScheme.error)
                         }
                     } else {
                         Spacer(modifier = Modifier.height(16.dp))
@@ -137,7 +137,7 @@ fun CashScreen(
                 MultiPOSCard(modifier = Modifier.weight(1f), elevation = 1.dp) {
                     if (movements.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No hay movimientos", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.cash_no_movements), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     } else {
                         LazyColumn(

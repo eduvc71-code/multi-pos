@@ -122,7 +122,7 @@ class LoginActivity : ComponentActivity() {
     
     private fun attemptLogin() {
         if (username.isBlank() || password.isBlank()) {
-            Toast.makeText(this, "Ingresa tu usuario y contraseña", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.login_toast_credentials, Toast.LENGTH_SHORT).show()
             return
         }
         
@@ -196,7 +196,7 @@ class LoginActivity : ComponentActivity() {
         } catch (e: Exception) {
             android.util.Log.e("LoginActivity", "openHome: CRITICAL ERROR", e)
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@LoginActivity, "Error al iniciar: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, getString(R.string.login_error_open_home, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }

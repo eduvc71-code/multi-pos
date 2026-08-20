@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multipos.app.R
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.ui.theme.success
@@ -93,7 +95,7 @@ fun DashboardScreen(
                     elevation = 2.dp
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Text("VENTAS HOY", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.dashboard_sales_today), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.weight(1f))
                         Text(Money.formatPlain(totalSalesToday), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.primary)
                         Surface(
@@ -110,7 +112,7 @@ fun DashboardScreen(
                     elevation = 2.dp
                 ) {
                     Column(modifier = Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("ALERTAS", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.dashboard_alerts_title), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.weight(1f))
                         Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
                         Text(lowStockCount.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
@@ -135,8 +137,8 @@ fun DashboardScreen(
             }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), "INVENTARIO", Icons.Default.Inventory, Color(0xFF5C6BC0))
-                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), "CLIENTES", Icons.Default.People, Color(0xFF66BB6A))
+                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), stringResource(R.string.dashboard_quick_inventory), Icons.Default.Inventory, Color(0xFF5C6BC0))
+                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), stringResource(R.string.dashboard_quick_clients), Icons.Default.People, Color(0xFF66BB6A))
             }
         }
     }

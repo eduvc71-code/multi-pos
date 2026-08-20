@@ -13,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multipos.app.R
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSTextField
 import com.multipos.app.ui.theme.MultiPOSTheme
@@ -68,7 +70,7 @@ fun SetupScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Configuración",
+                    text = stringResource(R.string.setup_title),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onBackground
@@ -76,7 +78,7 @@ fun SetupScreen(
             }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Crea tu espacio de trabajo premium",
+                text = stringResource(R.string.setup_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -92,44 +94,44 @@ fun SetupScreen(
         ) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 
-                Text(text = "DATOS DEL NEGOCIO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                Text(text = stringResource(R.string.setup_business_section), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 
                 MultiPOSTextField(
                     value = businessName,
                     onValueChange = onBusinessNameChange,
-                    label = "Nombre Comercial",
+                    label = stringResource(R.string.setup_business_name_label),
                     leadingIcon = { Icon(Icons.Default.Storefront, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = businessNit,
                     onValueChange = onBusinessNitChange,
-                    label = "NIT / ID Fiscal",
+                    label = stringResource(R.string.setup_business_nit_label),
                     leadingIcon = { Icon(Icons.Default.Badge, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 
-                Text(text = "ACCESO PROPIETARIO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                Text(text = stringResource(R.string.setup_owner_section), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 
                 MultiPOSTextField(
                     value = ownerName,
                     onValueChange = onOwnerNameChange,
-                    label = "Nombre Completo",
+                    label = stringResource(R.string.setup_owner_name_label),
                     leadingIcon = { Icon(Icons.Default.Person, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = username,
                     onValueChange = onUsernameChange,
-                    label = "Usuario de acceso",
+                    label = stringResource(R.string.setup_username_label),
                     leadingIcon = { Icon(Icons.Default.AccountCircle, null, tint = MaterialTheme.colorScheme.primary) }
                 )
                 
                 MultiPOSTextField(
                     value = pass,
                     onValueChange = onPassChange,
-                    label = "Contraseña Segura",
+                    label = stringResource(R.string.setup_password_label),
                     leadingIcon = { Icon(Icons.Default.Lock, null, tint = MaterialTheme.colorScheme.primary) },
                     visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -142,7 +144,7 @@ fun SetupScreen(
                 MultiPOSTextField(
                     value = confirmPass,
                     onValueChange = onConfirmPassChange,
-                    label = "Confirmar Contraseña",
+                    label = stringResource(R.string.setup_confirm_password_label),
                     leadingIcon = { Icon(Icons.Default.LockReset, null, tint = MaterialTheme.colorScheme.primary) },
                     visualTransformation = if (confirmPassVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -155,7 +157,7 @@ fun SetupScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 MultiPOSButton(
-                    text = "Finalizar Configuración",
+                    text = stringResource(R.string.setup_create_button),
                     onClick = onCreateClick,
                     showLoading = isLoading
                 )

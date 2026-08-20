@@ -17,17 +17,24 @@
     <string name="empty_products">No hay productos registrados</string>
     <string name="cart_total">Total: %1$s</string>
     <string name="add_to_cart">Añadir al carrito</string>
-    <string name="setup_title">Configura MultiPOS</string>
-    <string name="setup_subtitle">Registra tu negocio y crea la cuenta segura del propietario.</string>
-    <string name="setup_business_section">Datos del negocio</string>
-    <string name="setup_owner_section">Propietario y acceso</string>
-    <string name="business_name">Nombre del negocio</string>
-    <string name="business_nit_optional">NIT (opcional)</string>
-    <string name="company_name_hint">Nombre de la empresa</string>
-    <string name="owner_name">Nombre del propietario</string>
-    <string name="create_password">Crear contraseña</string>
-    <string name="confirm_password">Confirmar contraseña</string>
-    <string name="create_workspace">Crear espacio de trabajo</string>
+    <string name="setup_title">Configuración</string>
+    <string name="setup_subtitle">Crea tu espacio de trabajo premium</string>
+    <string name="setup_business_section">DATOS DEL NEGOCIO</string>
+    <string name="setup_business_name_label">Nombre Comercial</string>
+    <string name="setup_business_nit_label">NIT / ID Fiscal</string>
+    <string name="setup_owner_section">ACCESO PROPIETARIO</string>
+    <string name="setup_owner_name_label">Nombre Completo</string>
+    <string name="setup_username_label">Usuario de acceso</string>
+    <string name="setup_password_label">Contraseña Segura</string>
+    <string name="setup_confirm_password_label">Confirmar Contraseña</string>
+    <string name="setup_create_button">Finalizar Configuración</string>
+    <string name="setup_toast_business_name">Ingresa el nombre del negocio</string>
+    <string name="setup_toast_owner_name">Ingresa el nombre del propietario</string>
+    <string name="setup_toast_username_invalid">Usuario inválido (4-30 caracteres)</string>
+    <string name="setup_toast_password_length">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="setup_toast_password_mismatch">Las contraseñas no coinciden</string>
+    <string name="setup_toast_error">Error: %1$s</string>
+    <string name="setup_company_exists">Ya existe una empresa</string>
     <string name="workspace_label">ESPACIO DE TRABAJO</string>
     <string name="company_default">Empresa: Mi empresa</string>
     <string name="company_format">Empresa: %1$s</string>
@@ -242,4 +249,363 @@
         <item>RESTAURANTE</item>
         <item>FARMACIA</item>
     </string-array>
+</resources>
+
+    <!-- POS Screen -->
+    <string name="pos_quantity_header">CANTIDAD</string>
+    <string name="pos_product_header">PRODUCTO</string>
+    <string name="pos_total_header">TOTAL</string>
+    <string name="pos_client_label">CLIENTE:</string>
+    <string name="pos_client_general">GENERAL</string>
+    <string name="pos_cancel_button">CANCELAR</string>
+    <string name="pos_add_button">AGREGAR</string>
+    <string name="pos_payment_method_cash">EFECTIVO</string>
+    <string name="pos_payment_method_qr">QR</string>
+    <string name="pos_payment_method_card">TARJETA</string>
+    <string name="pos_payment_method_credit">CRÉDITO</string>
+    <string name="pos_payment_via">Pago vía %1$s</string>
+    <string name="pos_return_button">REGRESAR</string>
+    <string name="pos_finalize_sale">FINALIZAR VENTA</string>
+    <string name="pos_change_label">CAMBIO (VUELTO)</string>
+    <string name="pos_select_quantity_title">SELECCIONAR CANTIDAD</string>
+    <string name="pos_product_detected_title">Producto Detectado</string>
+    <string name="pos_product_not_in_inventory_message">Este producto no está en el inventario</string>
+    <string name="pos_add_save_button">AGREGAR Y GUARDAR</string>
+    
+    <!-- Home Screen -->
+    <string name="home_menu_pos">POS</string>
+    <string name="home_logout">SALIR</string>
+    <string name="home_menu_dashboard">Inicio</string>
+    <string name="home_menu_sales">Ventas</string>
+    <string name="home_menu_inventory">Inventario</string>
+    <string name="home_menu_history">Historial</string>
+    <string name="home_menu_clients">Clientes</string>
+    <string name="home_menu_cash">Caja</string>
+    <string name="home_menu_reports">Reportes</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_alerts">ALERTAS</string>
+    <string name="dashboard_quick_action_inventory">INVENTARIO</string>
+    <string name="dashboard_quick_action_clients">CLIENTES</string>
+    
+    <!-- History Screen -->
+    <string name="history_annulled">ANULADA</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_total_column">TOTAL</string>
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_refund_partial">Registrar Devolución Parcial</string>
+    
+    <!-- Inventory Screen -->
+    <string name="inventory_product_header">PRODUCTO</string>
+    <string name="inventory_sample_product_name">Arroz 1kg</string>
+    
+    <!-- Clients Screen -->
+    <string name="clients_stat_total">TOTAL</string>
+    <string name="clients_status_active">ACTIVO</string>
+    
+    <!-- Employees Screen -->
+    <string name="employees_role_owner">PROPIETARIO</string>
+    <string name="employees_role_seller">VENDEDOR</string>
+    
+    <!-- Cash Screen -->
+    <string name="cash_summary_income">INGRESOS</string>
+    <string name="cash_summary_expense">EGRESOS</string>
+    <string name="cash_movement_type_income">INGRESO</string>
+    <string name="cash_movement_type_expense">EGRESO</string>
+    
+    <!-- Reports Screen -->
+    <string name="reports_metric_sales">VENTAS</string>
+    <string name="reports_metric_profit">GANANCIA</string>
+    
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_use">USAR</string>
+    
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_export_csv_icon">CSV</string>
+    <string name="estado_cuenta_export_pdf_icon">PDF</string>
+    
+    <!-- Common -->
+    <string name="common_cancel">CANCELAR</string>
+    <string name="common_no_results">No hay resultados</string>
+    <string name="common_search_hint">Buscar...</string>
+    <string name="common_from">Desde</string>
+    <string name="common_to">Hasta</string>
+    <string name="common_pay">Abonar</string>
+    <string name="common_no_movements">Sin movimientos</string>
+    
+    <!-- Home Screen -->
+    <string name="home_logout">SALIR</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_partial_return">Registrar Devolución Parcial</string>
+    <string name="sale_detail_total_label">TOTAL</string>
+    <string name="sale_detail_annulled_badge">ANULADA</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_alerts_title">ALERTAS</string>
+    <string name="dashboard_quick_inventory">INVENTARIO</string>
+    <string name="dashboard_quick_clients">CLIENTES</string>
+    
+    <!-- Cash Screen -->
+    <string name="cash_summary_income">INGRESOS</string>
+    <string name="cash_summary_expense">EGRESOS</string>
+    
+    <!-- POS Screen -->
+    <string name="pos_payment_method_cash">EFECTIVO</string>
+    <string name="pos_payment_method_qr">QR</string>
+    <string name="pos_payment_method_card">TARJETA</string>
+    <string name="pos_payment_method_credit">CRÉDITO</string>
+    <string name="pos_payment_via">Pago vía %1$s</string>
+    <string name="pos_payment_return">REGRESAR</string>
+    
+    <!-- Inventory Screen -->
+    <string name="inventory_table_header_product">PRODUCTO</string>
+    
+    <!-- History Screen -->
+    <string name="history_employee_placeholder">Juan Pérez</string>
+    <string name="history_employee_role_owner">PROPIETARIO</string>
+    <string name="history_employee_role_seller">VENDEDOR</string>
+    
+    <!-- Clients Screen -->
+    <string name="clients_stat_total">TOTAL</string>
+    
+    <!-- Reports Screen -->
+    <string name="reports_metric_sales">VENTAS</string>
+    <string name="reports_metric_profit">GANANCIA</string>
+
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_use">USAR</string>
+
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_export_csv_icon">CSV</string>
+    <string name="estado_cuenta_export_pdf_icon">PDF</string>
+
+    <!-- Common Strings -->
+    <string name="common_cancel">CANCELAR</string>
+    <string name="common_search_product">Buscar producto...</string>
+    <string name="common_no_results">No hay resultados</string>
+    <string name="common_no_transactions">No hay transacciones</string>
+    <string name="common_no_collaborators">No hay colaboradores</string>
+    <string name="common_no_clients">No hay clientes registrados</string>
+    <string name="common_no_movements">No hay movimientos</string>
+    <string name="common_start_query">Inicia una consulta para ver resultados</string>
+    <string name="common_folio">Folio: %1$s</string>
+    <string name="common_new_sale">Nueva Venta</string>
+    <string name="common_sale_success">¡VENTA EXITOSA!</string>
+
+    <!-- Product Detection Dialog -->
+    <string name="product_detected_title">Producto Detectado</string>
+    <string name="product_detected_message">Este producto no está en tu inventario. Ingresa un precio para venderlo ahora y guardarlo.</string>
+    <string name="product_detected_price_label">Precio de Venta</string>
+    <string name="product_detected_add_save">AGREGAR Y GUARDAR</string>
+    <string name="product_detected_searching">Buscando producto en la red...</string>
+
+    <!-- POS Screen -->
+    <string name="pos_search_placeholder">Buscar producto (ej: PA)...</string>
+    <string name="pos_stock_warning">Advertencia: Supera stock (%1$d)</string>
+    <string name="pos_payment_title">PAGO Y COBRO</string>
+    <string name="pos_total_to_pay">TOTAL A PAGAR</string>
+    <string name="pos_cash_received">EFECTIVO RECIBIDO</string>
+    <string name="pos_cash_placeholder">0.00</string>
+    <string name="pos_change">CAMBIO (VUELTO)</string>
+    <string name="pos_finalize_sale">FINALIZAR VENTA</string>
+
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_partial_return">Registrar Devolución Parcial</string>
+    <string name="sale_detail_annul_confirm">¿Estás seguro de anular esta venta? Esta acción no se puede deshacer.</string>
+    <string name="sale_detail_annul_button">ANULAR VENTA</string>
+
+    <!-- Home Screen -->
+    <string name="home_logout">SALIR</string>
+
+    <!-- Dashboard Screen -->
+    <string name="dashboard_sales_today">VENTAS HOY</string>
+    <string name="dashboard_alerts">ALERTAS</string>
+
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_title">Estado de Cuenta</string>
+    <string name="estado_cuenta_from">Desde</string>
+    <string name="estado_cuenta_until">Hasta</string>
+    <string name="estado_cuenta_filter">Filtrar</string>
+    <string name="estado_cuenta_pay">Abonar</string>
+    <string name="estado_cuenta_no_movements">Sin movimientos en el periodo</string>
+
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_code">Ingresar código manual</string>
+
+    <!-- Inventory Screen -->
+    <string name="inventory_search_placeholder">Buscar producto...</string>
+    <string name="inventory_no_results">No hay resultados</string>
+
+    <!-- History Screen -->
+    <string name="history_no_transactions">No hay transacciones</string>
+
+    <!-- Employees Screen -->
+    <string name="employees_no_collaborators">No hay colaboradores</string>
+
+    <!-- Clients Screen -->
+    <string name="clients_no_clients">No hay clientes registrados</string>
+
+    <!-- Cash Screen -->
+    <string name="cash_no_movements">No hay movimientos</string>
+
+    <!-- Reports Screen -->
+    <string name="reports_start_query">Inicia una consulta para ver resultados</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">MultiPOS</string>
+    <string name="login_subtitle">Caja • Ventas • Créditos</string>
+    <string name="login_section_title">Iniciar Sesión</string>
+    <string name="login_description">Ingresa con tus credenciales asignadas</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_footer">MultiPOS · Punto de Venta v2.0</string>
+    
+    <!-- History Screen -->
+    <string name="history_title">Historial</string>
+    <string name="history_search_placeholder">Folio o cliente...</string>
+    <string name="history_total_today">TOTAL HOY</string>
+    <string name="history_folio_prefix">Folio #%1$s</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_title">Detalle de Venta</string>
+    <string name="sale_detail_back">Regresar</string>
+    <string name="sale_detail_refunds_title">Devoluciones Realizadas</string>
+    <string name="sale_detail_products_title">Productos</string>
+    <string name="sale_detail_product_default">Producto #%1$d</string>
+    <string name="sale_detail_quantity_format">Cantidad: %1$d</string>
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_partial_refund">Registrar Devolución Parcial</string>
+    <string name="sale_detail_refund_reason_prefix">Motivo: %1$s</string>
+    
+    <!-- Inventory Screen -->
+    <string name="inventory_title">Inventario</string>
+    <string name="inventory_header_cost">COSTO\n(UNIT)</string>
+    <string name="inventory_header_price">PRECIO\n(VENTA)</string>
+    <string name="inventory_header_stock">STOCK\n(ACT)</string>
+    
+    <!-- Employees Screen -->
+    <string name="employees_title">Equipo</string>
+    <string name="employees_search_placeholder">Buscar colaborador...</string>
+    <string name="employees_no_collaborators">No hay colaboradores</string>
+    
+    <!-- Clients Screen -->
+    <string name="clients_no_clients">No hay clientes registrados</string>
+    
+    <!-- Cash Screen -->
+    <string name="cash_no_movements">No hay movimientos</string>
+    
+    <!-- Reports Screen -->
+    <string name="reports_title">Reportes</string>
+    <string name="reports_selected_label">REPORTE SELECCIONADO</string>
+    <string name="reports_generate_button">Generar Ahora</string>
+    <string name="reports_row_quantity_prefix">Cant: %1$d</string>
+    
+    <!-- Home Activity -->
+    <string name="home_company_loading">Cargando...</string>
+    <string name="home_menu_dashboard">DASHBOARD</string>
+    <string name="home_no_permission">No tienes permiso</string>
+    <string name="home_logout_button">SALIR</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_sales_today">VENTAS HOY</string>
+    <string name="dashboard_alerts">ALERTAS</string>
+    <string name="dashboard_income_by_method">INGRESOS POR MEDIO</string>
+    <string name="dashboard_low_stock_alert">Stock bajo: %1$s</string>
+    <string name="dashboard_out_of_stock_alert">Sin stock: %1$s</string>
+    
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_title">Estado de Cuenta</string>
+    <string name="estado_cuenta_from">Desde</string>
+    <string name="estado_cuenta_to">Hasta</string>
+    <string name="estado_cuenta_pay">Abonar</string>
+    <string name="estado_cuenta_no_movements">Sin movimientos</string>
+    
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_input">Ingresar código manual</string>
+    <string name="scanner_use_button">USAR</string>
+    
+    <!-- Sale Success Dialog -->
+    <string name="sale_success_folio">Folio:</string>
+    
+    <!-- POS Screen -->
+    <string name="pos_select_quantity_title">SELECCIONAR CANTIDAD</string>
+    <string name="pos_finalize_sale">FINALIZAR VENTA</string>
+    <string name="pos_change_label">CAMBIO (VUELTO)</string>
+    <string name="pos_product_detected_title">Producto Detectado</string>
+    <string name="pos_product_not_in_inventory">El producto no está en el inventario</string>
+    <string name="pos_add_save_button">AGREGAR Y GUARDAR</string>
+    <string name="pos_cancel_button">CANCELAR</string>
+    <string name="pos_product_name_label">Nombre</string>
+    <string name="pos_product_cost_label">Costo</string>
+    <string name="pos_product_price_label">Precio</string>
+    <string name="pos_product_stock_label">Stock inicial</string>
+    <string name="pos_product_barcode_label">Código de barras</string>
+    <string name="pos_quick_add_title">AGREGAR RÁPIDO</string>
+    <string name="pos_existing_product_message">Producto existente. ¿Deseas agregarlo al carrito?</string>
+    <string name="pos_add_to_cart_button">Agregar al Carrito</string>
+    <string name="pos_new_product_message">Producto nuevo. ¿Deseas registrarlo y agregarlo?</string>
+    <string name="pos_register_add_button">Registrar y Agregar</string>
+    <string name="pos_scanned_product">Producto Escaneado</string>
+    <string name="pos_scan_again">Escanear otro</string>
+    <string name="pos_manual_code">Código Manual</string>
+    <string name="pos_enter_code_placeholder">Ingresa el código</string>
+    <string name="pos_search_product">Buscar producto...</string>
+    <string name="pos_no_results">No hay resultados</string>
+    <string name="pos_empty_cart_message">Agrega productos para comenzar la venta</string>
+    <string name="pos_items_count">%1$d artículos</string>
+    <string name="pos_total_label">TOTAL</string>
+    <string name="pos_payment_method">MÉTODO DE PAGO</string>
+    <string name="pos_cash">Efectivo</string>
+    <string name="pos_card">Tarjeta</string>
+    <string name="pos_transfer">Transferencia</string>
+    <string name="pos_credit_qr">Crédito QR</string>
+    <string name="pos_received_label">RECIBIDO</string>
+    <string name="pos_insufficient_received">Monto insuficiente</string>
+    <string name="pos_client_label">CLIENTE</string>
+    <string name="pos_select_client">Seleccionar cliente</string>
+    <string name="pos_no_client">Sin cliente</string>
+    <string name="pos_clear_cart">Limpiar carrito</string>
+    <string name="pos_confirm_clear">¿Estás seguro de limpiar el carrito?</string>
+    <string name="pos_keep_cart">Mantener</string>
+    <string name="pos_clear_button">Limpiar</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_title">Detalle de Venta</string>
+    <string name="sale_detail_date_label">Fecha</string>
+    <string name="sale_detail_seller_label">Vendedor</string>
+    <string name="sale_detail_customer_label">Cliente</string>
+    <string name="sale_detail_payment_method_label">Método de pago</string>
+    <string name="sale_detail_subtotal_label">Subtotal</string>
+    <string name="sale_detail_discount_label">Descuento</string>
+    <string name="sale_detail_tax_label">Impuesto</string>
+    <string name="sale_detail_unit_price_prefix">Precio unit: </string>
+    
+    <!-- Login Screen -->
+    <string name="login_exit_content_desc">Salir</string>
+    <string name="login_logo_content_desc">Logo</string>
+    <string name="login_toast_credentials">Ingresa tu usuario y contraseña</string>
+    <string name="login_error_open_home">Error al iniciar: %1$s</string>
+    
+    <!-- Home Activity -->
+    <string name="home_company_loading">Cargando...</string>
+    <string name="home_no_role">Sin rol</string>
+    <string name="home_select_company_title">Seleccionar Empresa</string>
+    <string name="home_no_permission_toast">No tienes permiso</string>
+    
+    <!-- Home Screen Menu Items -->
+    <string name="menu_pos_short">POS</string>
+    <string name="menu_dashboard_item">Inicio</string>
+    <string name="menu_sales_item">Ventas</string>
+    
+    <!-- Navigation Wrappers -->
+    <string name="nav_scan_product">Escanear producto</string>
+    <string name="nav_scan_client_qr">Escanear QR de cliente</string>
+    
+    <!-- Reports Screen -->
+    <string name="report_sales_label">VENTAS</string>
+    <string name="report_profit_label">GANANCIA</string>
+    
 </resources>

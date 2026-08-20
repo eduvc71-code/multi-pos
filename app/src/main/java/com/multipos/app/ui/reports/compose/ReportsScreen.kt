@@ -47,7 +47,7 @@ fun ReportsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Reportes",
+                text = stringResource(R.string.reports_title),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Black,
                 color = MaterialTheme.colorScheme.onBackground
@@ -64,7 +64,7 @@ fun ReportsScreen(
         MultiPOSCard(elevation = 2.dp) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    text = "REPORTE SELECCIONADO",
+                    text = stringResource(R.string.reports_selected_label),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -77,7 +77,7 @@ fun ReportsScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 MultiPOSButton(
-                    text = "Generar Ahora",
+                    text = stringResource(R.string.reports_generate_button),
                     onClick = onGenerateReport,
                     showLoading = isLoading
                 )
@@ -87,8 +87,8 @@ fun ReportsScreen(
         if (reportData != null) {
             // Hero Metrics
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ReportMetricSmall(label = "VENTAS", value = Money.format(reportData.totalVentas), modifier = Modifier.weight(1f))
-                ReportMetricSmall(label = "GANANCIA", value = Money.format(reportData.totalGanancia), modifier = Modifier.weight(1f))
+                ReportMetricSmall(label = stringResource(R.string.report_sales_label), value = Money.format(reportData.totalVentas), modifier = Modifier.weight(1f))
+                ReportMetricSmall(label = stringResource(R.string.report_profit_label), value = Money.format(reportData.totalGanancia), modifier = Modifier.weight(1f))
             }
 
             // Results Container
@@ -105,7 +105,7 @@ fun ReportsScreen(
             }
         } else if (!isLoading) {
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Inicia una consulta para ver resultados", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.reports_start_query), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -129,7 +129,7 @@ fun ReportRowPremium(row: ReportRow) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = row.descripcion, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-            Text(text = "Cant: ${row.cantidad}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = stringResource(R.string.reports_row_quantity_prefix, row.cantidad), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(
             text = Money.formatPlain(row.total),

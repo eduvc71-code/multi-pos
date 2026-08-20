@@ -13,9 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multipos.app.R
 import com.multipos.app.data.entities.Venta
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSSearchField
@@ -42,7 +44,7 @@ fun HistoryScreen(
     ) {
         // Header Executive
         Text(
-            text = "Historial",
+            text = stringResource(R.string.history_title),
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground
@@ -52,7 +54,7 @@ fun HistoryScreen(
         MultiPOSSearchField(
             value = searchQuery,
             onValueChange = onSearchChange,
-            placeholder = "Folio o cliente..."
+            placeholder = stringResource(R.string.history_search_placeholder)
         )
         
         // Summary Card
@@ -63,7 +65,7 @@ fun HistoryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "TOTAL HOY",
+                    text = stringResource(R.string.history_total_today),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -86,7 +88,7 @@ fun HistoryScreen(
                 }
             } else if (sales.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay transacciones", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.history_no_transactions), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -116,7 +118,7 @@ fun SaleListItemPremium(sale: Venta, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Folio #${sale.id}",
+                text = stringResource(R.string.history_folio_prefix, sale.id.toString()),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -146,7 +148,7 @@ fun SaleListItemPremium(sale: Venta, onClick: () -> Unit) {
             )
             if (sale.estado == Venta.ESTADO_ANULADA) {
                 Text(
-                    text = "ANULADA",
+                    text = stringResource(R.string.sale_detail_annulled_badge),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.error

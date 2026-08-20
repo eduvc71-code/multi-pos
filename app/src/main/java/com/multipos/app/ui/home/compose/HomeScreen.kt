@@ -48,7 +48,7 @@ fun HomeScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "POS",
+                                text = stringResource(R.string.menu_pos_short),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Black,
                                 color = MaterialTheme.colorScheme.primary,
@@ -66,7 +66,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 12.dp),
                             modifier = Modifier.height(48.dp) // Aumentado a 48dp para touch target estándar
                         ) {
-                            Text("SALIR", color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                            Text(stringResource(R.string.home_logout), color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Black)
                         }
                     }
                     
@@ -79,13 +79,13 @@ fun HomeScreen(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        MenuItem(Icons.Default.Analytics, "Inicio", selectedMenu == "DASHBOARD", companyColor) { onMenuItemClick("DASHBOARD") }
-                        MenuItem(Icons.Default.ShoppingCart, "Ventas", selectedMenu == "POS", companyColor) { onMenuItemClick("POS") }
-                        MenuItem(Icons.Default.Inventory, "Inventario", selectedMenu == "INVENTORY", companyColor) { onMenuItemClick("INVENTORY") }
-                        MenuItem(Icons.Default.History, "Historial", selectedMenu == "HISTORY", companyColor) { onMenuItemClick("HISTORY") }
-                        MenuItem(Icons.Default.People, "Clientes", selectedMenu == "CLIENTS", companyColor) { onMenuItemClick("CLIENTS") }
-                        MenuItem(Icons.Default.Payments, "Caja", selectedMenu == "CASH", companyColor) { onMenuItemClick("CASH") }
-                        MenuItem(Icons.Default.BarChart, "Reportes", selectedMenu == "REPORTS", companyColor) { onMenuItemClick("REPORTS") }
+                        MenuItem(Icons.Default.Analytics, stringResource(R.string.menu_dashboard_item), selectedMenu == "DASHBOARD", companyColor) { onMenuItemClick("DASHBOARD") }
+                        MenuItem(Icons.Default.ShoppingCart, stringResource(R.string.menu_sales_item), selectedMenu == "POS", companyColor) { onMenuItemClick("POS") }
+                        MenuItem(Icons.Default.Inventory, stringResource(R.string.menu_inventory), selectedMenu == "INVENTORY", companyColor) { onMenuItemClick("INVENTORY") }
+                        MenuItem(Icons.Default.History, stringResource(R.string.menu_history), selectedMenu == "HISTORY", companyColor) { onMenuItemClick("HISTORY") }
+                        MenuItem(Icons.Default.People, stringResource(R.string.menu_clients), selectedMenu == "CLIENTS", companyColor) { onMenuItemClick("CLIENTS") }
+                        MenuItem(Icons.Default.Payments, stringResource(R.string.menu_cash), selectedMenu == "CASH", companyColor) { onMenuItemClick("CASH") }
+                        MenuItem(Icons.Default.BarChart, stringResource(R.string.menu_reports), selectedMenu == "REPORTS", companyColor) { onMenuItemClick("REPORTS") }
                     }
                 }
             }

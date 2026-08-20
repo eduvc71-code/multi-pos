@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.multipos.app.R
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.data.models.CartLine
 import com.multipos.app.ui.components.MultiPOSCard
@@ -165,10 +167,10 @@ fun POSScreen(
                             .border(androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableCell("CANTIDAD", Modifier.weight(0.15f), isHeader = true)
-                        TableCell("PRODUCTO", Modifier.weight(0.50f), isHeader = true)
+                        TableCell(stringResource(R.string.pos_quantity_header), Modifier.weight(0.15f), isHeader = true)
+                        TableCell(stringResource(R.string.pos_product_header), Modifier.weight(0.50f), isHeader = true)
                         TableCell("P/U", Modifier.weight(0.17f), isHeader = true, alignEnd = true)
-                        TableCell("TOTAL", Modifier.weight(0.18f), isHeader = true, alignEnd = true)
+                        TableCell(stringResource(R.string.pos_total_header), Modifier.weight(0.18f), isHeader = true, alignEnd = true)
                     }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -192,7 +194,7 @@ fun POSScreen(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Column {
-                    Text(text = "CLIENTE: ${selectedClient ?: "GENERAL"}", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                    Text(text = "${stringResource(R.string.pos_client_label)} ${selectedClient ?: stringResource(R.string.pos_client_general)}", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
                     Text(text = "ITEMS: ${cartLines.sumOf { it.quantity }}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                 }
                 Column(horizontalAlignment = Alignment.End) {
@@ -262,7 +264,7 @@ fun QuantitySelectionDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Text("SELECCIONAR CANTIDAD", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.pos_select_quantity_title), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(product.nombre.uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
 
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -283,10 +285,10 @@ fun QuantitySelectionDialog(
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(onClick = onDismiss, modifier = Modifier.weight(1f).height(48.dp), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
-                        Text("CANCELAR", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.pos_cancel_button), color = Color.White, fontWeight = FontWeight.Bold)
                     }
                     Button(onClick = { onConfirm(qty) }, modifier = Modifier.weight(1f).height(48.dp), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
-                        Text("AGREGAR", fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.pos_add_button), fontWeight = FontWeight.Black)
                     }
                 }
             }
@@ -347,10 +349,10 @@ fun PaymentMethodDialog(total: Long, onDismiss: () -> Unit, onConfirm: (method: 
                 Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary).padding(20.dp)) { Text("PAGO Y COBRO", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, letterSpacing = 1.sp) }
                 Row(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.width(100.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)).fillMaxHeight()) {
-                        PaymentSidebarItem("EFECTIVO", Icons.Default.Payments, selectedMethod == "EFECTIVO") { selectedMethod = "EFECTIVO" }
-                        PaymentSidebarItem("QR", Icons.Default.QrCode, selectedMethod == "QR") { selectedMethod = "QR" }
-                        PaymentSidebarItem("TARJETA", Icons.Default.CreditCard, selectedMethod == "TARJETA") { selectedMethod = "TARJETA" }
-                        PaymentSidebarItem("CRÉDITO", Icons.Default.Description, selectedMethod == "CREDITO") { selectedMethod = "CREDITO" }
+                        PaymentSidebarItem(stringResource(R.string.pos_payment_method_cash), Icons.Default.Payments, selectedMethod == "EFECTIVO") { selectedMethod = "EFECTIVO" }
+                        PaymentSidebarItem(stringResource(R.string.pos_payment_method_qr), Icons.Default.QrCode, selectedMethod == "QR") { selectedMethod = "QR" }
+                        PaymentSidebarItem(stringResource(R.string.pos_payment_method_card), Icons.Default.CreditCard, selectedMethod == "TARJETA") { selectedMethod = "TARJETA" }
+                        PaymentSidebarItem(stringResource(R.string.pos_payment_method_credit), Icons.Default.Description, selectedMethod == "CREDITO") { selectedMethod = "CREDITO" }
                     }
                     Column(modifier = Modifier.weight(1f).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Text("TOTAL A PAGAR", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -362,12 +364,12 @@ fun PaymentMethodDialog(total: Long, onDismiss: () -> Unit, onConfirm: (method: 
                             Text("CAMBIO (VUELTO)", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
                             Text(Money.formatPlain(changeMinor), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, color = Color.Red)
                         } else {
-                            Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(imageVector = when(selectedMethod) { "QR" -> Icons.Default.QrCode; "TARJETA" -> Icons.Default.CreditCard; else -> Icons.Default.Description }, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)); Text("Pago vía $selectedMethod", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+                            Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(imageVector = when(selectedMethod) { "QR" -> Icons.Default.QrCode; "TARJETA" -> Icons.Default.CreditCard; else -> Icons.Default.Description }, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)); Text(stringResource(R.string.pos_payment_via, selectedMethod), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             Button(onClick = { onConfirm(selectedMethod) }, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("FINALIZAR VENTA", fontWeight = FontWeight.Black, letterSpacing = 1.sp) }
-                            OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant); Spacer(modifier = Modifier.width(10.dp)); Text("REGRESAR", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant); Spacer(modifier = Modifier.width(10.dp)); Text(stringResource(R.string.pos_payment_return), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                     }
                 }

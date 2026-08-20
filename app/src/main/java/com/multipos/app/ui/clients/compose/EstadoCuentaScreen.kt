@@ -51,7 +51,7 @@ fun EstadoCuentaScreen(
         modifier = modifier.imePadding(),
         topBar = {
             TopAppBar(
-                title = { Text("Estado de Cuenta", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.estado_cuenta_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
@@ -104,20 +104,20 @@ fun EstadoCuentaScreen(
                             OutlinedTextField(
                                 value = desde,
                                 onValueChange = onDesdeChange,
-                                label = { Text("Desde") },
+                                label = { Text(stringResource(R.string.estado_cuenta_from)) },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
                             )
                             OutlinedTextField(
                                 value = hasta,
                                 onValueChange = onHastaChange,
-                                label = { Text("Hasta") },
+                                label = { Text(stringResource(R.string.estado_cuenta_until)) },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
                             )
                         }
                         Button(onClick = onFiltrarClick, modifier = Modifier.fillMaxWidth()) {
-                            Text("Filtrar")
+                            Text(stringResource(R.string.estado_cuenta_filter))
                         }
                     }
                 }
@@ -132,7 +132,7 @@ fun EstadoCuentaScreen(
                             modifier = Modifier.weight(1.2f),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.success)
                         ) {
-                            Text("Abonar", color = Color.White)
+                            Text(stringResource(R.string.estado_cuenta_pay), color = Color.White)
                         }
                     }
                     
@@ -149,7 +149,7 @@ fun EstadoCuentaScreen(
             if (movimientos.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text("Sin movimientos en el periodo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.estado_cuenta_no_movements), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             } else {

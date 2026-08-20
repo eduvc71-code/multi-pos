@@ -77,23 +77,23 @@ class SetupActivity : ComponentActivity() {
         val userTrim = username.trim().lowercase()
         
         if (businessName.length < 2) { 
-            Toast.makeText(this, "Ingresa el nombre del negocio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.setup_toast_business_name, Toast.LENGTH_SHORT).show()
             return 
         }
         if (ownerName.length < 3) { 
-            Toast.makeText(this, "Ingresa el nombre del propietario", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.setup_toast_owner_name, Toast.LENGTH_SHORT).show()
             return 
         }
         if (!userTrim.matches(Regex("[a-z0-9._-]{4,30}"))) { 
-            Toast.makeText(this, "Usuario inválido (4-30 caracteres)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.setup_toast_username_invalid, Toast.LENGTH_SHORT).show()
             return 
         }
         if (pass.length < 8) { 
-            Toast.makeText(this, "La contraseña debe tener al menos 8 caracteres", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.setup_toast_password_length, Toast.LENGTH_SHORT).show()
             return 
         }
         if (pass != confirmPass) { 
-            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.setup_toast_password_mismatch, Toast.LENGTH_SHORT).show()
             return 
         }
 
@@ -109,7 +109,7 @@ class SetupActivity : ComponentActivity() {
                 val db = DatabaseProvider.get(this@SetupActivity)
                 var createdUser: Usuario? = null
                 db.withTransaction {
-                    if (db.empresaDao().count() > 0) throw IllegalStateException("Ya existe una empresa")
+                    if (db.empresaDao().count() > 0) throw IllegalStateException(getString(R.string.setup_company_exists))
                     db.empresaDao().insert(company)
                     val id = db.usuarioDao().insert(
                         Usuario(
@@ -140,7 +140,7 @@ class SetupActivity : ComponentActivity() {
                 finishAffinity()
             } catch (e: Exception) {
                 setLoading(false)
-                Toast.makeText(this@SetupActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SetupActivity, getString(R.string.setup_toast_error, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }

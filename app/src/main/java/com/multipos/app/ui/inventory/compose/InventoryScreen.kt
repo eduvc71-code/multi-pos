@@ -15,12 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multipos.app.R
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
@@ -47,7 +49,7 @@ fun InventoryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Inventario",
+                        text = stringResource(R.string.inventory_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black
                     )
@@ -76,7 +78,7 @@ fun InventoryScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = { Text("Buscar producto...") },
+                placeholder = { Text(stringResource(R.string.inventory_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(4.dp),
@@ -104,10 +106,10 @@ fun InventoryScreen(
                             .border(androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableCellHeader("PRODUCTO", Icons.Default.Inventory2, Modifier.weight(0.45f))
-                        TableCellHeader("COSTO\n(UNIT)", Icons.Default.AttachMoney, Modifier.weight(0.18f))
-                        TableCellHeader("PRECIO\n(VENTA)", Icons.Default.Sell, Modifier.weight(0.18f))
-                        TableCellHeader("STOCK\n(ACT)", Icons.Default.Inventory, Modifier.weight(0.19f))
+                        TableCellHeader(stringResource(R.string.inventory_table_header_product), Icons.Default.Inventory2, Modifier.weight(0.45f))
+                        TableCellHeader(stringResource(R.string.inventory_header_cost), Icons.Default.AttachMoney, Modifier.weight(0.18f))
+                        TableCellHeader(stringResource(R.string.inventory_header_price), Icons.Default.Sell, Modifier.weight(0.18f))
+                        TableCellHeader(stringResource(R.string.inventory_header_stock), Icons.Default.Inventory, Modifier.weight(0.19f))
                     }
 
                     if (isLoading) {
@@ -119,7 +121,7 @@ fun InventoryScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(Icons.Default.Inventory, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
                                 Spacer(modifier = Modifier.height(12.dp))
-                                Text("No hay resultados", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.inventory_no_results), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     } else {

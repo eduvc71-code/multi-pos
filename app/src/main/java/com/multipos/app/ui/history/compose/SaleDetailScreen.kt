@@ -13,8 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.multipos.app.R
 import com.multipos.app.data.entities.*
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.util.Money
@@ -43,7 +45,7 @@ fun SaleDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Detalle de Venta",
+                        text = stringResource(R.string.sale_detail_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -52,7 +54,7 @@ fun SaleDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Regresar"
+                            contentDescription = stringResource(R.string.sale_detail_back)
                         )
                     }
                 },
@@ -99,7 +101,7 @@ fun SaleDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Venta #${sale.id}",
+                            text = stringResource(R.string.history_folio_prefix, sale.id.toString()),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurface
@@ -129,25 +131,25 @@ fun SaleDetailScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    InfoRow("Fecha", dateFormat.format(Date(sale.fecha)))
-                    InfoRow("Vendedor", vendedorName)
-                    InfoRow("Cliente", clienteName)
-                    InfoRow("Método de pago", sale.tipoPago)
+                    InfoRow(stringResource(R.string.sale_detail_date_label), dateFormat.format(Date(sale.fecha)))
+                    InfoRow(stringResource(R.string.sale_detail_seller_label), vendedorName)
+                    InfoRow(stringResource(R.string.sale_detail_customer_label), clienteName)
+                    InfoRow(stringResource(R.string.sale_detail_payment_method_label), sale.tipoPago)
                     
                     Divider(modifier = Modifier.padding(vertical = 12.dp))
                     
-                    InfoRow("Subtotal", Money.format(sale.subtotal))
+                    InfoRow(stringResource(R.string.sale_detail_subtotal_label), Money.format(sale.subtotal))
                     if (sale.descuento > 0) {
-                        InfoRow("Descuento", "-${Money.format(sale.descuento)}", Color.Red)
+                        InfoRow(stringResource(R.string.sale_detail_discount_label), "-${Money.format(sale.descuento)}", Color.Red)
                     }
                     if (sale.impuesto > 0) {
-                        InfoRow("Impuesto", Money.format(sale.impuesto))
+                        InfoRow(stringResource(R.string.sale_detail_tax_label), Money.format(sale.impuesto))
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     InfoRow(
-                        "TOTAL",
+                        stringResource(R.string.sale_detail_total_label),
                         Money.format(sale.total),
                         MaterialTheme.colorScheme.primary,
                         FontWeight.Bold
@@ -158,7 +160,7 @@ fun SaleDetailScreen(
             // Sección de Devoluciones (si existen)
             if (refunds.isNotEmpty()) {
                 Text(
-                    text = "Devoluciones Realizadas",
+                    text = stringResource(R.string.sale_detail_refunds_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error
@@ -171,7 +173,7 @@ fun SaleDetailScreen(
                                 Text(text = dateFormat.format(Date(refund.fecha)), style = MaterialTheme.typography.bodySmall)
                                 Text(text = Money.format(refund.monto), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
                             }
-                            Text(text = "Motivo: ${refund.motivo}", style = MaterialTheme.typography.bodySmall)
+                            Text(text = stringResource(R.string.sale_detail_refund_reason_prefix, refund.motivo), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
@@ -179,7 +181,7 @@ fun SaleDetailScreen(
             
             // Lista de items
             Text(
-                text = "Productos",
+                text = stringResource(R.string.sale_detail_products_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -202,7 +204,7 @@ fun SaleDetailScreen(
                     ) {
                         Icon(Icons.Default.Cancel, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Anular Venta Completa")
+                        Text(stringResource(R.string.sale_detail_annul_complete))
                     }
                 }
                 
@@ -216,7 +218,7 @@ fun SaleDetailScreen(
                 ) {
                     Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Registrar Devolución Parcial")
+                    Text(stringResource(R.string.sale_detail_partial_return))
                 }
             }
             
@@ -269,7 +271,7 @@ fun SaleDetailItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = detail.nombreProductoSnapshot.ifBlank { "Producto #${detail.idProducto}" },
+                    text = detail.nombreProductoSnapshot.ifBlank { stringResource(R.string.sale_detail_product_default, detail.idProducto) },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -279,13 +281,13 @@ fun SaleDetailItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "Cantidad: ${detail.cantidad}",
+                    text = stringResource(R.string.sale_detail_quantity_format, detail.cantidad),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Text(
-                    text = "Precio unit: ${Money.format(detail.precioUnitario)}",
+                    text = stringResource(R.string.sale_detail_unit_price_prefix) + Money.format(detail.precioUnitario),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
