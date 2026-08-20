@@ -243,3 +243,87 @@
         <item>FARMACIA</item>
     </string-array>
 </resources>
+
+    <!-- POS Screen -->
+    <string name="pos_quantity_header">CANTIDAD</string>
+    <string name="pos_product_header">PRODUCTO</string>
+    <string name="pos_total_header">TOTAL</string>
+    <string name="pos_client_label">CLIENTE:</string>
+    <string name="pos_client_general">GENERAL</string>
+    <string name="pos_cancel_button">CANCELAR</string>
+    <string name="pos_add_button">AGREGAR</string>
+    <string name="pos_payment_method_cash">EFECTIVO</string>
+    <string name="pos_payment_method_qr">QR</string>
+    <string name="pos_payment_method_card">TARJETA</string>
+    <string name="pos_payment_method_credit">CRÉDITO</string>
+    <string name="pos_payment_via">Pago vía %1$s</string>
+    <string name="pos_return_button">REGRESAR</string>
+    <string name="pos_finalize_sale">FINALIZAR VENTA</string>
+    <string name="pos_change_label">CAMBIO (VUELTO)</string>
+    <string name="pos_select_quantity_title">SELECCIONAR CANTIDAD</string>
+    <string name="pos_product_detected_title">Producto Detectado</string>
+    <string name="pos_product_not_in_inventory_message">Este producto no está en el inventario</string>
+    <string name="pos_add_save_button">AGREGAR Y GUARDAR</string>
+    
+    <!-- Home Screen -->
+    <string name="home_menu_pos">POS</string>
+    <string name="home_logout">SALIR</string>
+    <string name="home_menu_dashboard">Inicio</string>
+    <string name="home_menu_sales">Ventas</string>
+    <string name="home_menu_inventory">Inventario</string>
+    <string name="home_menu_history">Historial</string>
+    <string name="home_menu_clients">Clientes</string>
+    <string name="home_menu_cash">Caja</string>
+    <string name="home_menu_reports">Reportes</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_alerts">ALERTAS</string>
+    <string name="dashboard_quick_action_inventory">INVENTARIO</string>
+    <string name="dashboard_quick_action_clients">CLIENTES</string>
+    
+    <!-- History Screen -->
+    <string name="history_annulled">ANULADA</string>
+    
+    <!-- Sale Detail Screen -->
+    <string name="sale_detail_total_column">TOTAL</string>
+    <string name="sale_detail_annul_complete">Anular Venta Completa</string>
+    <string name="sale_detail_refund_partial">Registrar Devolución Parcial</string>
+    
+    <!-- Inventory Screen -->
+    <string name="inventory_product_header">PRODUCTO</string>
+    <string name="inventory_sample_product_name">Arroz 1kg</string>
+    
+    <!-- Clients Screen -->
+    <string name="clients_stat_total">TOTAL</string>
+    <string name="clients_status_active">ACTIVO</string>
+    
+    <!-- Employees Screen -->
+    <string name="employees_role_owner">PROPIETARIO</string>
+    <string name="employees_role_seller">VENDEDOR</string>
+    
+    <!-- Cash Screen -->
+    <string name="cash_summary_income">INGRESOS</string>
+    <string name="cash_summary_expense">EGRESOS</string>
+    <string name="cash_movement_type_income">INGRESO</string>
+    <string name="cash_movement_type_expense">EGRESO</string>
+    
+    <!-- Reports Screen -->
+    <string name="reports_metric_sales">VENTAS</string>
+    <string name="reports_metric_profit">GANANCIA</string>
+    
+    <!-- Scanner Screen -->
+    <string name="scanner_manual_use">USAR</string>
+    
+    <!-- Estado Cuenta Screen -->
+    <string name="estado_cuenta_export_csv_icon">CSV</string>
+    <string name="estado_cuenta_export_pdf_icon">PDF</string>
+    
+    <!-- Common -->
+    <string name="common_cancel">CANCELAR</string>
+    <string name="common_no_results">No hay resultados</string>
+    <string name="common_search_hint">Buscar...</string>
+    <string name="common_from">Desde</string>
+    <string name="common_to">Hasta</string>
+    <string name="common_pay">Abonar</string>
+    <string name="common_no_movements">Sin movimientos</string>
+</resources>
