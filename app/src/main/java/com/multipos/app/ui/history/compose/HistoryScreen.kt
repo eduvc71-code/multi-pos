@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
@@ -15,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.multipos.app.R
 import com.multipos.app.data.entities.Venta
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSSearchField
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,10 +31,10 @@ fun HistoryScreen(
     sales: List<Venta>,
     searchQuery: String,
     isLoading: Boolean,
+    modifier: Modifier = Modifier,
     onSearchChange: (String) -> Unit,
     totalToday: Long,
     onSaleClick: (Venta) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -155,5 +156,26 @@ fun SaleListItemPremium(sale: Venta, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HistoryScreenPreview() {
+    val sampleSales = listOf(
+        Venta(id = 1, total = 50000, tipoPago = "EFECTIVO", fecha = System.currentTimeMillis(), idUsuario = 1),
+        Venta(id = 2, total = 25000, tipoPago = "TARJETA", fecha = System.currentTimeMillis() - 3600000, idUsuario = 1),
+        Venta(id = 3, total = 10000, tipoPago = "EFECTIVO", fecha = System.currentTimeMillis() - 7200000, idUsuario = 1, estado = Venta.ESTADO_ANULADA)
+    )
+    
+    MultiPOSTheme {
+        HistoryScreen(
+            sales = sampleSales,
+            searchQuery = "",
+            isLoading = false,
+            onSearchChange = {},
+            totalToday = 75000,
+            onSaleClick = {}
+        )
     }
 }

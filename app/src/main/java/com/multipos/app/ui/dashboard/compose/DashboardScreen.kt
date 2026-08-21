@@ -31,10 +31,9 @@ import com.multipos.app.util.Money
 fun DashboardScreen(
     companyName: String,
     totalSalesToday: Long,
-    totalProducts: Int,
     lowStockCount: Int,
     onLogoutClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -64,7 +63,7 @@ fun DashboardScreen(
                         letterSpacing = 1.sp
                     )
                     Text(
-                        text = "Control Center",
+                        text = stringResource(R.string.dashboard_subtitle),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Black,
                         color = MaterialTheme.colorScheme.onBackground
@@ -79,7 +78,7 @@ fun DashboardScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Salir",
+                        contentDescription = stringResource(R.string.home_logout),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(18.dp)
                     )
@@ -95,14 +94,30 @@ fun DashboardScreen(
                     elevation = 2.dp
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Text(stringResource(R.string.dashboard_sales_today), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            text = stringResource(R.string.dashboard_sales_today),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(Money.formatPlain(totalSalesToday), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            text = Money.formatPlain(totalSalesToday),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Surface(
                             shape = RoundedCornerShape(4.dp),
                             color = MaterialTheme.colorScheme.success.copy(alpha = 0.15f)
                         ) {
-                            Text("+18%", style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.success, modifier = Modifier.padding(horizontal = 4.dp))
+                            Text(
+                                text = "+18%",
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.success,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
                         }
                     }
                 }
@@ -111,46 +126,110 @@ fun DashboardScreen(
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     elevation = 2.dp
                 ) {
-                    Column(modifier = Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(stringResource(R.string.dashboard_alerts_title), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dashboard_alerts_title),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Spacer(modifier = Modifier.weight(1f))
-                        Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
-                        Text(lowStockCount.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = lowStockCount.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             }
 
-            MultiPOSCard(modifier = Modifier.fillMaxWidth().height(if (isSmallScreen) 80.dp else 100.dp), elevation = 1.dp) {
+            MultiPOSCard(
+                modifier = Modifier.fillMaxWidth().height(if (isSmallScreen) 80.dp else 100.dp),
+                elevation = 1.dp
+            ) {
                 Column(modifier = Modifier.padding(14.dp)) {
-                    Text("INGRESOS POR MEDIO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = stringResource(R.string.dashboard_income_by_method),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(modifier = Modifier.weight(1f))
                     Row(modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape)) {
                         Box(modifier = Modifier.weight(0.7f).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
                         Box(modifier = Modifier.weight(0.2f).fillMaxHeight().background(Color(0xFF00ACC1)))
                         Box(modifier = Modifier.weight(0.1f).fillMaxHeight().background(Color(0xFFFFA000)))
                     }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("EFECTIVO 70%", style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), color = Color.Gray)
-                        Text("OTROS 30%", style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "${stringResource(R.string.pos_payment_method_cash)} 70%",
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "${stringResource(R.string.dashboard_other)} 30%",
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                            color = Color.Gray
+                        )
                     }
                 }
             }
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), stringResource(R.string.dashboard_quick_inventory), Icons.Default.Inventory, Color(0xFF5C6BC0))
-                QuickActionButton(Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp), stringResource(R.string.dashboard_quick_clients), Icons.Default.People, Color(0xFF66BB6A))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                QuickActionButton(
+                    modifier = Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp),
+                    label = stringResource(R.string.dashboard_quick_inventory),
+                    icon = Icons.Default.Inventory,
+                    color = Color(0xFF5C6BC0)
+                )
+                QuickActionButton(
+                    modifier = Modifier.weight(1f).height(if (isSmallScreen) 70.dp else 80.dp),
+                    label = stringResource(R.string.dashboard_quick_clients),
+                    icon = Icons.Default.People,
+                    color = Color(0xFF66BB6A)
+                )
             }
         }
     }
 }
 
 @Composable
-fun QuickActionButton(modifier: Modifier, label: String, icon: ImageVector, color: Color) {
+fun QuickActionButton(
+    modifier: Modifier = Modifier,
+    label: String,
+    icon: ImageVector,
+    color: Color
+) {
     MultiPOSCard(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.height(4.dp))
-            Text(label, style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), fontWeight = FontWeight.Black, color = Color.Gray)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                fontWeight = FontWeight.Black,
+                color = Color.Gray
+            )
         }
     }
 }
@@ -162,9 +241,9 @@ fun DashboardScreenPreview() {
         DashboardScreen(
             companyName = "Demo MultiPOS",
             totalSalesToday = 1250500,
-            totalProducts = 45,
             lowStockCount = 3,
-            onLogoutClick = {}
+            onLogoutClick = {},
+            modifier = Modifier
         )
     }
 }

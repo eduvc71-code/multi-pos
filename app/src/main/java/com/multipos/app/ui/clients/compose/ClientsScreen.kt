@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,12 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.multipos.app.R
 import com.multipos.app.data.entities.Cliente
 import com.multipos.app.ui.components.MultiPOSCard
-import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.components.MultiPOSSearchField
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.ui.theme.success
@@ -32,11 +29,11 @@ fun ClientsScreen(
     clients: List<Cliente>,
     searchQuery: String,
     isLoading: Boolean,
+    modifier: Modifier = Modifier,
     onSearchChange: (String) -> Unit,
     onAddClientClick: () -> Unit,
     onEditClientClick: (Cliente) -> Unit,
     onViewStatementClick: (Cliente) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.imePadding(),
@@ -171,8 +168,8 @@ fun ClientListItemPremium(
 @Composable
 fun ClientsScreenPreview() {
     val dummyClients = listOf(
-        Cliente(1, "María García", "DNI 123456", "555-0101", "Calle 123", 50000, 10000, true, "ACTIVO", System.currentTimeMillis(), null, null, true, "EMP01"),
-        Cliente(2, "Tienda Don Pepe", "NIT 100200", "555-0103", "Bario Lindo", 100000, 65000, true, "ACTIVO", System.currentTimeMillis(), null, null, true, "EMP01")
+        Cliente(id = 1, nombre = "María García", documento = "DNI 123456", telefono = "555-0101", direccion = "Calle 123", limiteCredito = 50000, creditoActual = 10000, creditoHabilitado = true, estadoCredito = "ACTIVO", fechaInscripcion = System.currentTimeMillis(), activo = true, empresaId = "EMP01"),
+        Cliente(id = 2, nombre = "Tienda Don Pepe", documento = "NIT 100200", telefono = "555-0103", direccion = "Bario Lindo", limiteCredito = 100000, creditoActual = 65000, creditoHabilitado = true, estadoCredito = "ACTIVO", fechaInscripcion = System.currentTimeMillis(), activo = true, empresaId = "EMP01")
     )
     MultiPOSTheme {
         ClientsScreen(

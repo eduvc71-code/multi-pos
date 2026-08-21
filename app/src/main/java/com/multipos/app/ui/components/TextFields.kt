@@ -9,11 +9,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.ui.theme.premiumBorder
 
 /**
@@ -33,17 +32,22 @@ fun MultiPOSTextField(
     isError: Boolean = false,
     errorMessage: String? = null,
     singleLine: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        // Usamos placeholder para el look "Pill" limpio, o label si se prefiere
-        placeholder = { Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+        placeholder = { 
+            Text(
+                text = placeholder ?: label, 
+                style = MaterialTheme.typography.bodyMedium, 
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            ) 
+        },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp), // Radio fijo optimizado para texto largo
+        shape = RoundedCornerShape(28.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -70,7 +74,7 @@ fun MultiPOSSearchField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "Buscar...",
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) {
     OutlinedTextField(
         value = value,
@@ -107,35 +111,33 @@ fun MultiPOSSearchField(
     )
 }
 
-/**
- * TextField numérico para cantidades y precios
- */
+@Preview(showBackground = true)
 @Composable
-fun MultiPOSNumberField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-    prefix: String? = null,
-    suffix: String? = null,
-    enabled: Boolean = true
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, fontWeight = FontWeight.Medium) },
-        leadingIcon = prefix?.let { { Text(it, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold) } },
-        trailingIcon = suffix?.let { { Text(it, style = MaterialTheme.typography.bodyLarge) } },
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(50),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.premiumBorder
-        ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        singleLine = true,
-        enabled = enabled
-    )
+fun TextFieldsPreview() {
+    MultiPOSTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            MultiPOSTextField(
+                value = "",
+                onValueChange = {},
+                label = "Nombre de Usuario"
+            )
+            MultiPOSTextField(
+                value = "Contenido",
+                onValueChange = {},
+                label = "Campo con Texto"
+            )
+            MultiPOSSearchField(
+                value = "",
+                onValueChange = {},
+                placeholder = "Buscar productos..."
+            )
+            MultiPOSSearchField(
+                value = "Búsqueda activa",
+                onValueChange = {}
+            )
+        }
+    }
 }

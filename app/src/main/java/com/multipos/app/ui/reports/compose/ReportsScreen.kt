@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material3.*
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.multipos.app.data.ReportData
 import com.multipos.app.data.ReportRow
 import com.multipos.app.data.ReportSummary
+import androidx.compose.ui.res.stringResource
+import com.multipos.app.R
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.theme.MultiPOSTheme
@@ -29,9 +30,9 @@ fun ReportsScreen(
     reportType: String,
     reportData: ReportData?,
     isLoading: Boolean,
+    modifier: Modifier = Modifier,
     onGenerateReport: () -> Unit,
     onExportCsv: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -155,6 +156,13 @@ fun ReportsScreenPreview() {
         rentabilidad = 28.0
     )
     MultiPOSTheme {
-        ReportsScreen("Ventas por Día", dummyData, false, {}, {})
+        ReportsScreen(
+            reportType = "Ventas por Día",
+            reportData = dummyData,
+            isLoading = false,
+            modifier = Modifier,
+            onGenerateReport = {},
+            onExportCsv = {}
+        )
     }
 }

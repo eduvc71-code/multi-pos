@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.multipos.app.R
 import com.multipos.app.data.entities.Producto
-import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
@@ -35,13 +34,13 @@ fun InventoryScreen(
     products: List<Producto>,
     searchQuery: String,
     isLoading: Boolean,
+    modifier: Modifier = Modifier,
     onSearchChange: (String) -> Unit,
     onAddProductClick: () -> Unit,
     onEditProductClick: (Producto) -> Unit,
     onDeleteProductClick: (Producto) -> Unit,
     onMovementsClick: () -> Unit,
     onScanClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.imePadding(),
@@ -180,7 +179,7 @@ fun TableCell(text: String, modifier: Modifier, alignEnd: Boolean = false, color
 
 @Composable
 fun ProductRowExcel(product: Producto, onEdit: () -> Unit, onDelete: () -> Unit) {
-    var showActions by remember { mutableStateOf(false) }
+    var showActions by remember { mutableStateOf(value = false) }
     
     Column(modifier = Modifier.clickable { showActions = !showActions }) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -214,6 +213,6 @@ fun InventoryScreenPreview() {
         Producto(1, "Arroz 1kg", "PROD001", 1200, 800, 50, 5, "Abarrotes", "", "123", "EAN", "EMP")
     )
     MultiPOSTheme {
-        InventoryScreen(dummyProducts, "", false, {}, {}, {}, {}, {}, {})
+        InventoryScreen(dummyProducts, "", false, Modifier, {}, {}, {}, {}, {}, {})
     }
 }

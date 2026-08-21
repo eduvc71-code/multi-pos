@@ -5,9 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +28,6 @@ import androidx.compose.ui.window.Dialog
 import com.multipos.app.R
 import com.multipos.app.data.entities.Producto
 import com.multipos.app.data.models.CartLine
-import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.components.MultiPOSButton
 import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
@@ -42,27 +38,23 @@ fun POSScreen(
     products: List<Producto>,
     cartLines: List<CartLine>,
     selectedClient: String?,
-    paymentMethod: String,
     total: Long,
     searchQuery: String,
     isLoading: Boolean,
+    modifier: Modifier = Modifier,
     warning: String? = null,
     onSearchChange: (String) -> Unit,
     onAddToCart: (Producto, Int) -> Unit,
     onIncreaseQuantity: (Int) -> Unit,
     onDecreaseQuantity: (Int) -> Unit,
     onRemoveFromCart: (Int) -> Unit,
-    onClearCart: () -> Unit,
     onPaymentMethodSelected: (String) -> Unit,
-    onClientSelected: (String) -> Unit,
     onChargeClick: () -> Unit,
     onScanProduct: () -> Unit,
-    onScanClientQr: () -> Unit,
     onClearWarning: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    var showSearchResults by remember { mutableStateOf(false) }
-    var showPaymentDialog by remember { mutableStateOf(false) }
+    var showSearchResults by remember { mutableStateOf(value = false) }
+    var showPaymentDialog by remember { mutableStateOf(value = false) }
     var lineToEdit by remember { mutableStateOf<Int?>(null) }
     var productToQtyDialog by remember { mutableStateOf<Producto?>(null) }
 
@@ -82,9 +74,9 @@ fun POSScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Punto de Venta",
+                        text = stringResource(R.string.pos_title),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black
+                        fontWeight = FontWeight.Black,
                     )
                 },
                 actions = {
@@ -95,7 +87,7 @@ fun POSScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    actionIconContentColor = Color.White,
                 )
             )
         }
@@ -116,7 +108,7 @@ fun POSScreen(
                         onSearchChange(it)
                         showSearchResults = it.isNotEmpty()
                     },
-                    placeholder = { Text("Buscar producto (ej: PA)...") },
+                    placeholder = { Text(stringResource(R.string.pos_search_placeholder)) },
                     leadingIcon = { Icon(Icons.Default.Search, null, tint = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(4.dp),
@@ -195,10 +187,10 @@ fun POSScreen(
             ) {
                 Column {
                     Text(text = "${stringResource(R.string.pos_client_label)} ${selectedClient ?: stringResource(R.string.pos_client_general)}", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
-                    Text(text = "ITEMS: ${cartLines.sumOf { it.quantity }}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                    Text(text = stringResource(R.string.pos_items_count, cartLines.sumOf { it.quantity }), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = "TOTAL BS.", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                    Text(text = stringResource(R.string.pos_total_label), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
                     Text(
                         text = Money.formatPlain(total),
                         style = MaterialTheme.typography.displayMedium,
@@ -209,7 +201,7 @@ fun POSScreen(
             }
 
             MultiPOSButton(
-                text = "Finalizar Cobro",
+                text = stringResource(R.string.charge_sale),
                 onClick = { if (cartLines.isNotEmpty()) showPaymentDialog = true },
                 enabled = cartLines.isNotEmpty() && !isLoading,
                 showLoading = isLoading
@@ -250,7 +242,7 @@ fun QuantitySelectionDialog(
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
-    var qty by remember { mutableStateOf(1) }
+    var qty by remember { mutableIntStateOf(1) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -279,7 +271,7 @@ fun QuantitySelectionDialog(
 
                 if (qty > product.stock) {
                     Surface(color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp)) {
-                        Text("Advertencia: Supera stock (${product.stock})", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+                        Text(stringResource(R.string.pos_stock_warning, product.stock), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                     }
                 }
 
@@ -339,14 +331,14 @@ fun ProductSearchRow(product: Producto, onClick: () -> Unit) {
 
 @Composable
 fun PaymentMethodDialog(total: Long, onDismiss: () -> Unit, onConfirm: (method: String) -> Unit) {
-    var amountPaidText by remember { mutableStateOf("") }
-    var selectedMethod by remember { mutableStateOf("EFECTIVO") }
+    var amountPaidText by remember { mutableStateOf(value = "") }
+    var selectedMethod by remember { mutableStateOf(value = "EFECTIVO") }
     val amountPaid = amountPaidText.toDoubleOrNull() ?: 0.0
     val changeMinor = ((amountPaid * 100).toLong() - total).coerceAtLeast(0L)
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = Modifier.fillMaxWidth().heightIn(min = 500.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)) {
             Column {
-                Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary).padding(20.dp)) { Text("PAGO Y COBRO", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, letterSpacing = 1.sp) }
+                Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary).padding(20.dp)) { Text(stringResource(R.string.pos_payment_title), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, letterSpacing = 1.sp) }
                 Row(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.width(100.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)).fillMaxHeight()) {
                         PaymentSidebarItem(stringResource(R.string.pos_payment_method_cash), Icons.Default.Payments, selectedMethod == "EFECTIVO") { selectedMethod = "EFECTIVO" }
@@ -355,20 +347,20 @@ fun PaymentMethodDialog(total: Long, onDismiss: () -> Unit, onConfirm: (method: 
                         PaymentSidebarItem(stringResource(R.string.pos_payment_method_credit), Icons.Default.Description, selectedMethod == "CREDITO") { selectedMethod = "CREDITO" }
                     }
                     Column(modifier = Modifier.weight(1f).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Text("TOTAL A PAGAR", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.pos_total_to_pay), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(Money.formatPlain(total), style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.primary)
                         if (selectedMethod == "EFECTIVO") {
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            Text("EFECTIVO RECIBIDO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            OutlinedTextField(value = amountPaidText, onValueChange = { if (it.all { c -> c.isDigit() || c == '.' }) amountPaidText = it }, modifier = Modifier.fillMaxWidth(), textStyle = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), placeholder = { Text("0.00", color = Color.LightGray) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number), shape = RoundedCornerShape(12.dp))
-                            Text("CAMBIO (VUELTO)", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.pos_cash_received), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            OutlinedTextField(value = amountPaidText, onValueChange = { if (it.all { c -> (c.isDigit() || c == '.') }) amountPaidText = it }, modifier = Modifier.fillMaxWidth(), textStyle = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), placeholder = { Text(stringResource(R.string.pos_cash_placeholder), color = Color.LightGray) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number), shape = RoundedCornerShape(12.dp))
+                            Text(stringResource(R.string.pos_change), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
                             Text(Money.formatPlain(changeMinor), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, color = Color.Red)
                         } else {
                             Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(imageVector = when(selectedMethod) { "QR" -> Icons.Default.QrCode; "TARJETA" -> Icons.Default.CreditCard; else -> Icons.Default.Description }, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)); Text(stringResource(R.string.pos_payment_via, selectedMethod), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Button(onClick = { onConfirm(selectedMethod) }, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("FINALIZAR VENTA", fontWeight = FontWeight.Black, letterSpacing = 1.sp) }
+                            Button(onClick = { onConfirm(selectedMethod) }, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text(stringResource(R.string.pos_finalize_sale), fontWeight = FontWeight.Black, letterSpacing = 1.sp) }
                             OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant); Spacer(modifier = Modifier.width(10.dp)); Text(stringResource(R.string.pos_payment_return), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                     }
@@ -393,6 +385,23 @@ fun POSScreenPreview() {
     val dummyProducts = listOf(Producto(1, "Coca Cola 2L", "001", 1500, 1000, 24, 5, "Bebidas", "", "123", "EAN", "EMP"))
     val dummyCart = listOf(CartLine(dummyProducts[0], 2))
     MultiPOSTheme {
-        POSScreen(dummyProducts, dummyCart, "JUAN PEREZ", "EFECTIVO", 3000, "", false, null, {}, { _, _ -> }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        POSScreen(
+            products = dummyProducts,
+            cartLines = dummyCart,
+            selectedClient = "JUAN PEREZ",
+            total = 3000,
+            searchQuery = "",
+            isLoading = false,
+            modifier = Modifier,
+            onSearchChange = {},
+            onAddToCart = { _, _ -> },
+            onIncreaseQuantity = {},
+            onDecreaseQuantity = {},
+            onRemoveFromCart = {},
+            onPaymentMethodSelected = {},
+            onChargeClick = {},
+            onScanProduct = {},
+            onClearWarning = {}
+        )
     }
 }

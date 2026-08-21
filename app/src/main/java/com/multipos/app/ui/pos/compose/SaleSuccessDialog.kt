@@ -8,11 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.text.font.FontWeight
 import com.multipos.app.ui.components.MultiPOSButton
+import androidx.compose.ui.res.stringResource
+import com.multipos.app.R
 import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 
 @Composable
@@ -56,5 +60,17 @@ fun SaleSuccessDialog(folio: String, total: Long, onDismiss: () -> Unit) {
                 MultiPOSButton(text = stringResource(R.string.common_new_sale), onClick = onDismiss)
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SaleSuccessDialogPreview() {
+    MultiPOSTheme {
+        SaleSuccessDialog(
+            folio = "000123",
+            total = 150000,
+            onDismiss = {}
+        )
     }
 }

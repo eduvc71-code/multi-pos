@@ -5,8 +5,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multipos.app.R
 import com.multipos.app.data.entities.*
 import com.multipos.app.ui.components.MultiPOSCard
+import com.multipos.app.ui.theme.MultiPOSTheme
 import com.multipos.app.util.Money
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,7 +55,7 @@ fun SaleDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.sale_detail_back)
                         )
                     }
@@ -136,7 +138,7 @@ fun SaleDetailScreen(
                     InfoRow(stringResource(R.string.sale_detail_customer_label), clienteName)
                     InfoRow(stringResource(R.string.sale_detail_payment_method_label), sale.tipoPago)
                     
-                    Divider(modifier = Modifier.padding(vertical = 12.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                     
                     InfoRow(stringResource(R.string.sale_detail_subtotal_label), Money.format(sale.subtotal))
                     if (sale.descuento > 0) {
@@ -300,5 +302,37 @@ fun SaleDetailItem(
                 color = MaterialTheme.colorScheme.primary
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SaleDetailScreenPreview() {
+    val sampleSale = Venta(
+        id = 1,
+        total = 50000,
+        subtotal = 45000,
+        impuesto = 5000,
+        tipoPago = "EFECTIVO",
+        fecha = System.currentTimeMillis(),
+        idUsuario = 1
+    )
+    val sampleDetails = listOf(
+        DetalleVenta(id = 1, idVenta = 1, idProducto = 1, nombreProductoSnapshot = "Producto 1", cantidad = 2, precioUnitario = 20000, subtotal = 40000),
+        DetalleVenta(id = 2, idVenta = 1, idProducto = 2, nombreProductoSnapshot = "Producto 2", cantidad = 1, precioUnitario = 5000, subtotal = 5000)
+    )
+    
+    MultiPOSTheme {
+        SaleDetailScreen(
+            sale = sampleSale,
+            details = sampleDetails,
+            refunds = emptyList(),
+            vendedorName = "Admin",
+            clienteName = "Cliente General",
+            onBackClick = {},
+            onAnnulClick = {},
+            onRefundClick = {},
+            canManageReturns = true
+        )
     }
 }

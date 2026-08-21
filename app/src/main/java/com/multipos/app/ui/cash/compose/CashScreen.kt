@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -35,12 +34,11 @@ fun CashScreen(
     egresos: Long,
     movements: List<MovimientoCaja>,
     isCashOpen: Boolean,
-    isLoading: Boolean,
+    modifier: Modifier = Modifier,
     onOpenCashClick: () -> Unit,
     onCloseCashClick: () -> Unit,
     onAddIncomeClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.imePadding(),
@@ -200,7 +198,7 @@ fun CashScreenPreview() {
             egresos = 500,
             movements = dummyMovements,
             isCashOpen = true,
-            isLoading = false,
+            modifier = Modifier,
             onOpenCashClick = {},
             onCloseCashClick = {},
             onAddIncomeClick = {},

@@ -3,18 +3,22 @@ package com.multipos.app.ui.clients.compose
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons.Default
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.multipos.app.R
 import com.multipos.app.data.entities.Cliente
 import com.multipos.app.ui.components.MultiPOSCard
 import com.multipos.app.ui.theme.MultiPOSTheme
@@ -54,7 +58,7 @@ fun EstadoCuentaScreen(
                 title = { Text(stringResource(R.string.estado_cuenta_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 }
             )
@@ -76,7 +80,7 @@ fun EstadoCuentaScreen(
                             Text(text = it.nombre, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                             Text(text = "Límite: ${Money.format(it.limiteCredito)}", style = MaterialTheme.typography.bodyMedium)
                             
-                            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Column {
@@ -137,10 +141,10 @@ fun EstadoCuentaScreen(
                     }
                     
                     OutlinedIconButton(onClick = onExportCsvClick) {
-                        Icon(Icons.Default.TableChart, contentDescription = "CSV")
+                        Icon(Default.TableChart, contentDescription = "CSV")
                     }
                     OutlinedIconButton(onClick = onExportPdfClick) {
-                        Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF")
+                        Icon(Default.PictureAsPdf, contentDescription = "PDF")
                     }
                 }
             }
@@ -182,5 +186,42 @@ fun MovimientoItem(mov: MovimientoRow) {
                 Text(text = mov.saldoPosterior, style = MaterialTheme.typography.labelSmall)
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EstadoCuentaScreenPreview() {
+    val sampleCliente = Cliente(
+        id = 1,
+        nombre = "Juan Pérez",
+        documento = "12345678-9",
+        limiteCredito = 500000,
+        creditoActual = 150000,
+        creditoHabilitado = true,
+        estadoCredito = Cliente.ESTADO_ACTIVO
+    )
+    
+    val sampleMovimientos = listOf(
+        MovimientoRow("2026-08-01 10:00", "Venta #001", "$ 100.00", "$ 100.00", "Admin", true),
+        MovimientoRow("2026-08-02 14:30", "Abono #001", "$ 50.00", "$ 50.00", "Caja", false),
+        MovimientoRow("2026-08-05 09:15", "Venta #042", "$ 250.00", "$ 300.00", "Vendedor A", true)
+    )
+
+    MultiPOSTheme {
+        EstadoCuentaScreen(
+            cliente = sampleCliente,
+            movimientos = sampleMovimientos,
+            desde = "01/08/2026",
+            hasta = "20/08/2026",
+            onDesdeChange = {},
+            onHastaChange = {},
+            onFiltrarClick = {},
+            onRegistrarAbonoClick = {},
+            onExportCsvClick = {},
+            onExportPdfClick = {},
+            onBackClick = {},
+            canRegisterAbono = true
+        )
     }
 }

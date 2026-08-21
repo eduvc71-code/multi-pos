@@ -17,11 +17,14 @@ object UserSessionStore {
             .putLong(KEY_SESSION_STARTED_AT, now)
             .putLong(KEY_LAST_ACTIVITY_AT, now)
             .remove(KEY_ROLE_LEGACY)
-            .apply()
+            .commit() // Cambiado de apply a commit para asegurar persistencia inmediata
     }
 
-    fun userId(context: Context): Int =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_USER_ID, 0)
+    fun userId(context: Context): Int {
+        val id = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_USER_ID, 0)
+        android.util.Log.d("UserSessionStore", "userId() -> $id")
+        return id
+    }
 
     fun sessionStartedAt(context: Context): Long =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_SESSION_STARTED_AT, 0L)
@@ -43,6 +46,6 @@ object UserSessionStore {
             .remove(KEY_SESSION_STARTED_AT)
             .remove(KEY_LAST_ACTIVITY_AT)
             .remove(KEY_ROLE_LEGACY)
-            .apply()
+            .commit() // Cambiado de apply a commit
     }
 }

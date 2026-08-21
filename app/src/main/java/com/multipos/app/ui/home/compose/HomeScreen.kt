@@ -12,23 +12,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import com.multipos.app.R
+import com.multipos.app.ui.theme.MultiPOSTheme
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.multipos.app.ui.components.MultiPOSCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    activeCompanyName: String,
     userName: String,
-    userRole: String,
     companyColor: Color,
     onLogoutClick: () -> Unit,
-    onCompanyClick: () -> Unit,
     onMenuItemClick: (String) -> Unit,
     selectedMenu: String,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -48,7 +48,7 @@ fun HomeScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = stringResource(R.string.menu_pos_short),
+                                text = stringResource(R.string.app_name),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Black,
                                 color = MaterialTheme.colorScheme.primary,
@@ -128,5 +128,24 @@ fun MenuItem(
                 color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    MultiPOSTheme {
+        HomeScreen(
+            userName = "Admin",
+            companyColor = MaterialTheme.colorScheme.primary,
+            onLogoutClick = {},
+            onMenuItemClick = {},
+            selectedMenu = "POS",
+            content = {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Contenido de Prueba")
+                }
+            }
+        )
     }
 }
